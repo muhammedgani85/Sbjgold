@@ -1,0 +1,41 @@
+table tr td {
+  font-size: 12px !important;
+  text-align: left !important;
+  text-transform: uppercase;
+  color: #000000 !important;
+}
+table tr th {
+  font-size: 13px !important;
+  text-align: left !important;
+}
+.dt-length label {
+  display: none;
+}
+.status-new {
+  color: blue !important;
+  font-weight: bold;
+}
+
+.status-approved {
+  color: green !important;
+  font-weight: bold;
+}
+
+.status-rejected {
+  color: red !important;
+  font-weight: bold;
+}
+
+.status-dispatch {
+  color: orange !important;
+  font-weight: bold;
+}
+
+.status-withdraw {
+  color: purple !important;
+  font-weight: bold;
+}
+#layout-menu {
+  background-color: #cbc3e3 !important;
+  color: #fff !important;
+}

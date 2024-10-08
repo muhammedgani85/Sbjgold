@@ -1,0 +1,99 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Dashboards",
+      "icon": "menu-icon tf-icons bx bx-home-circle",
+      "slug": "dashboard"
+    },
+    {
+      "url": "users",
+      "name": "Employees ",
+      "icon": "menu-icon tf-icons bx bx-list-check",
+      "slug": "usermanagement"
+    },
+    {
+      "url": "customers",
+      "name": "Customers ",
+      "icon": "menu-icon tf-icons bx bx-list-check",
+      "slug": "customermanagement"
+    },
+    {
+      "name": "Loan",
+      "icon": "menu-icon tf-icons bx bx-box",
+      "slug": "ui",
+      "submenu": [
+        {
+          "url": "loans",
+          "name": "Dashboard",
+          "slug": "ui-accordion"
+        },
+        {
+          "url": "ui/accordion",
+          "name": "New Loan",
+          "slug": "ui-accordion"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Loan Interest",
+          "slug": "ui-alerts"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Loan Closing",
+          "slug": "ui-alerts"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Loan Renewal",
+          "slug": "ui-alerts"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Loan Outstanding",
+          "slug": "ui-alerts"
+        }
+      ]
+    },
+    {
+      "url": "bank",
+      "name": "Bank",
+      "icon": "menu-icon tf-icons bx bx-list-check",
+      "slug": "bankmanagement"
+    },
+    {
+      "url": "/",
+      "name": "Trail and Balance",
+      "icon": "menu-icon tf-icons bx bx-grid",
+      "slug": "trailandbalance"
+    },
+    {
+      "url": "/",
+      "name": "Expenses",
+      "icon": "menu-icon tf-icons bx bx-grid",
+      "slug": "trailandbalance"
+    },
+    {
+      "name": "Reports",
+      "icon": "menu-icon tf-icons bx bx-box",
+      "slug": "ui",
+      "submenu": [
+        {
+          "url": "ui/alerts",
+          "name": "Employee Attendance",
+          "slug": "ui-alerts"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Expenses",
+          "slug": "ui-alerts"
+        },
+        {
+          "url": "ui/alerts",
+          "name": "Customer",
+          "slug": "ui-alerts"
+        }
+      ]
+    }
+  ]
+}
