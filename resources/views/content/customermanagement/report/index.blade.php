@@ -1,14 +1,24 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Leave Management')
+@section('title', 'Customer Management')
 
 @section('page-script')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js"></script>
+
 <!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.0/css/buttons.dataTables.css">
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -33,7 +43,7 @@
 
 @section('content')
 <h4 class="py-0 mb-4">
-  <span class="text-muted fw-light" style="color:red !important;">Customer Report</span>
+  <span class="text-muted fw-light" style="color:red !important;">Customer</span>
 </h4>
 
 <div class="row">
@@ -100,8 +110,8 @@
 
 
 
-<table class="table table-bordered" style="margin-bottom: 20px;">
-    <thead>
+<table class="table table-bordered" style="margin-bottom: 20px;" id="customer_report">
+    <thead style="background-color: #aed6f1;">
         <tr>
             <th>Customer ID</th>
             <th>First Name</th>
@@ -135,38 +145,21 @@
 </div>
 
 <!-- Include required libraries -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+
+
 
 
 <script>
-new DataTable('#attendanceTable', {
-    "pageLength": 10, // Set default page length
-    "lengthMenu": [5, 10, 25, 50, 75, 100], // Set options for page length
-    "language": {
-      "search": "", // Remove the search label
-      "searchPlaceholder": "Search...", // Optionally, you can add a placeholder
-      "emptyTable": "No data available",
-      "info": "", // Remove the "Showing X to Y of Z entries"
-      "infoEmpty": "", // Remove the "Showing 0 to 0 of 0 entries"
-      "infoFiltered": "", // Remove the "filtered from X total entries"
-
-      "paginate": {
-        "first": "First",
-        "last": "Last",
-        "next": "Next",
-        "previous": "Previous"
-      },
-      "zeroRecords": "No matching records found"
-    },
-    "pagingType": "full_numbers",
-    "layout": {
-        "topStart": {
-            "buttons": ['copy', 'csv', 'excel', 'pdf', 'print']
-        }
+new DataTable('#customer_report', {
+    buttons: [
+        'excel'
+    ],
+    layout: {
+        topStart: 'buttons'
     }
-  });
+});
+
+
 </script>
 
 @endsection

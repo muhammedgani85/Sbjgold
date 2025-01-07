@@ -110,16 +110,18 @@
       <table class="table" id="usersTable">
       <thead>
         <tr>
-            <th>Loan No</th>
+            <th>L No</th>
             <th>Cust.ID</th>
             <th>Cust.Name</th>
             <th>S.H.Name</th>
-            <th>S.H.Loan Number</th>
+            <th>S.H.L Num</th>
             <th>Loan Amount</th>
             <th>Month</th>
-            <th>Int Rate</th>
+            <th>ROI</th>
             <th>L.Date</th>
+            <th>Status</th>
             <th>Photo</th>
+            <th>Document</th>
 
             <th>Actions</th>
         </tr>
@@ -136,8 +138,21 @@
                 <td>{{ $loan->tenurity }}</td>
                 <td>{{ $loan->interest_rate }}</td>
                 <td>{{ date('d-m-Y',strtotime($loan->loan_date)) }}</td> <!-- Assuming loan_date is a Carbon instance -->
+            <td>
+            <span class="
+            {{ $loan->status == 'Active' ? 'text-success' : '' }}
+            {{ $loan->status == 'Released' ? 'text-primary' : '' }}
+            {{ $loan->status == 'Action' ? 'text-danger' : '' }}
+            ">
+            {{ $loan->status }}
+            </span>
+            </td>
+
                 <td>
                 <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:100px; height:100px;">
+                </td>
+                <td>
+                <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;">
                 </td>
 
 

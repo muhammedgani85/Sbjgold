@@ -6,8 +6,22 @@
 <script src="{{asset('assets/js/form-basic-inputs.js')}}"></script>
 @endsection
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.print.min.js"></script>
 
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.0/css/buttons.dataTables.css">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 @section('content')
+
 <h4 class="py-0 mb-4">
   <span class="text-muted fw-light" style="color:red !important;">Loan Approval</span>
 </h4>
@@ -24,9 +38,10 @@
 
     <div class="table-responsive text-nowrap">
 
-      <table class="display" id="usersTable">
+      <table class="table" style="margin-bottom: 20px;" id="usersTable">
       <thead>
                 <tr>
+                  <th>Image</th>
                     <th>Loan Number</th>
                     <th>Customer Name</th>
                     <th>Loan Type</th>
@@ -40,6 +55,16 @@
             <tbody>
                 @foreach($loans as $loan)
                 <tr>
+
+                    <td>
+                    @if($loan->customer_photo!=NULL)
+                    <a href="{{ asset('storage/' . $loan->customer_photo) }}" target="_blank">
+                    <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+                    </a>
+                    @else
+                    No Image
+                    @endif
+                    </td>
                     <td>{{ $loan->loan_number }}</td>
                     <td>{{ $loan->customer->first_name.' '.$loan->customer->last_name }}</td>
                     <td>{{ $loan->loanType->loan_type }}</td> <!-- Ensure this line matches your LoanType model attributes -->

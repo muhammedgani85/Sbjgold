@@ -60,15 +60,13 @@
         <!-- Released Loans -->
         <tr>
             <td>Released Loans</td>
-            <td>{{ number_format($dailyReport['released_loans']['amount'], 2) }}</td>
-            <td>{{ number_format($dailyReport['released_loans']['grams'], 2) }}</td>
+           <!--  <td>{{ number_format($dailyReport['released_loans']['amount'], 2) }}</td>
+            <td>{{ number_format($dailyReport['released_loans']['grams'], 2) }}</td> -->
+            <td>{{ number_format($dailyReport['loan_release']['amount'], 2) }}</td>
+            <td>{{ number_format($dailyReport['loan_release']['total_grams'], 2) }}</td>
         </tr>
         <!-- Total Loans Upto Today -->
-        <tr>
-            <td>Total Loans Upto Today</td>
-            <td>{{ number_format($dailyReport['total_loans_upto_today']['amount'], 2) }}</td>
-            <td>{{ number_format($dailyReport['total_loans_upto_today']['upto_total_grams'], 2) }}</td> <!-- No grams for this category -->
-        </tr>
+
         <tr>
             <td>SJ Document Charge</td>
             <td>{{ number_format($dailyReport['total_loans_upto_today']['total_document_charges'], 2) }}</td>
@@ -87,15 +85,16 @@
             <td>—</td> <!-- No grams for this category -->
         </tr>
         <tr>
-            <td>OB OutStanding</td>
-            <td>{{ number_format($dailyReport['other_bank_loans']['amount'], 2) }}</td>
-            <td>{{ number_format($dailyReport['other_bank_loans']['grams'], 2) }}</td>
-        </tr>
-        <tr>
             <td>SH Document Charge</td>
             <td>{{ number_format($dailyReport['other_bank_loans']['other_bank_document_charges'], 2) }}</td>
             <td>--</td> <!-- No grams for this category -->
         </tr>
+        <tr>
+            <td style="color:green !important;font-weight:bold;">OB Loans</td>
+            <td style="color:green !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['amount'], 2) }}</td>
+            <td style="color:green !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['grams'], 2) }}</td>
+        </tr>
+
     </tbody>
     <tfoot>
         <!-- Totals -->

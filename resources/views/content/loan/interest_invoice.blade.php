@@ -43,10 +43,46 @@
         }
         /* Hide the print button when printing */
         @media print {
-            .no-print {
-                display: none;
-            }
+        body {
+            font-size: 12px;
         }
+
+        /* Ensure rows and columns follow the layout for print */
+        .row {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .col-md-6 {
+            flex: 1;
+        }
+
+        /* Table styles for print */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: left;
+        }
+
+        /* Hide elements with no-print class */
+        .no-print {
+            display: none;
+        }
+
+        /* Page settings */
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+
+
+}
     </style>
 </head>
 <body>
@@ -69,27 +105,30 @@
             <p><strong>Invoice No:</strong> #INV-12345</p>
             <p><strong>Issue Date:</strong> October 10, 2024</p>
         </div>
-        <div class="col-md-6 text-end">
-            <img src="customer-image.jpg" alt="Customer Image" class="img-thumbnail">
+        <div class="col-md-2 text-end">
+        <img src="{{ asset('storage/' . $interst_list->photo) }}" alt="Image" style="width:100px; height:100px;">
         </div>
     </div>
 
     <div class="row mt-4">
-        <div class="col-md-6">
-            <h6>Customer Details</h6>
-            <p><strong>Name:</strong> John Doe</p>
-            <p><strong>Customer ID:</strong> CUST-001</p>
-            <p><strong>Address:</strong> 1234 Elm St, Springfield, USA</p>
-            <p><strong>Phone:</strong> +1 234 567 890</p>
-        </div>
-        <div class="col-md-6">
-            <h6>Loan Details</h6>
-            <p><strong>Loan Number:</strong> LOAN-987654</p>
-            <p><strong>Loan Date:</strong> January 15, 2024</p>
-            <p><strong>Loan Amount:</strong> $10,000</p>
-            <p><strong>Interest Rate:</strong> 5% per month</p>
-        </div>
+    <!-- Customer Details -->
+    <div class="col-md-6">
+
+        <p><strong>Name:</strong> {{ $interst_list->first_name." ".$interst_list->last_name }} </p>
+        <p><strong>Customer ID:</strong> {{ $interst_list->customer_id }}</p>
+        <p><strong>Address:</strong> {{ $interst_list->communication_address }}</p>
+        <p><strong>Phone:</strong> +91 {{ $interst_list->customer_contact }}</p>
     </div>
+
+    <!-- Loan Details -->
+    <div class="col-md-6">
+
+        <p><strong>Loan Number:</strong> {{ $interst_list->loan_number }}</p>
+        <p><strong>Loan Date:</strong> {{ $interst_list->created_at }}</p>
+        <p><strong>Loan Amount:</strong> {{ $interst_list->total_loan_amount }}</p>
+    </div>
+</div>
+
 
     <div class="row mt-4">
         <div class="col-md-12">
@@ -100,18 +139,33 @@
                         <th>Month</th>
                         <th>Interest Amount</th>
                         <th>Payment Status</th>
+                        <th>Mode</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>January</td>
-                        <td>$500</td>
+                        <td>{{ $interst_list->month}}</td>
+                        <td>{{ $interst_list->interest_amount}}</td>
                         <td>Paid</td>
+                        <td>{{ $interst_list->payment_method}}</td>
                     </tr>
 
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div>
+<p><strong>1. Payment Schedule:</strong> Interest payments must be made according to the agreed schedule as outlined in the loan agreement. Any deviations require prior approval.</p>
+
+<p><strong>2. Late Payment Penalties:</strong> Late payments will incur additional charges as specified in the loan agreement. These charges are non-refundable and will compound if not paid promptly.</p>
+
+<p><strong>3. Interest Rate Changes:</strong> The interest rate is fixed unless otherwise stated in the agreement. Variable rates, if applicable, will fluctuate based on market conditions or index rates.</p>
+
+<p><strong>4. Prepayment Policy:</strong> Borrowers may prepay the loan without incurring additional charges, unless specified otherwise. Any prepayment will first be applied to outstanding interest before reducing the principal balance.</p>
+
+<p><strong>5. Default Terms:</strong> Failure to comply with payment terms may result in loan default. In such cases, additional legal actions or repossession of collateral may apply as per the terms of the agreement.</p>
+
     </div>
 
     <div class="row mt-4">

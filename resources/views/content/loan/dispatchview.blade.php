@@ -17,8 +17,8 @@
           <div id="customer_info">
 
           <div class="input-group">
-          <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/>
-
+          <!-- <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/> -->
+          <img src="{{ asset('storage/' . $loan->customer->customer_photo) }}" alt="Image" style="width:50px; height:50px;">
 
           </div>
 
@@ -152,12 +152,16 @@
         <div class="card-body demo-vertical-spacing demo-only-element">
 
         <div class="input-group">
-          @if($loan->customer_photo)
-          <img src="{{ asset('storage/photos/lOaImYU6oqX3S7nsWqRlOhOClq5tsemwuCvQGUZH.png') }}" alt="Your Image">
-          @else
-              No Photo Available
-          @endif
+        @if($loan->customer_other!=NULL)
+                    <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
+                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+
+                  </a>
+                    @else
+                    No Image
+                    @endif
           </div>
+
 
 
 
@@ -353,6 +357,9 @@
                             'The loan status has been updated.',
                             'success'
                         );
+
+
+                        window.location.href ='www.google.com';
                     },
                     error: function(xhr, status, error) {
                         Swal.fire(

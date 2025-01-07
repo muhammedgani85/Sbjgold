@@ -129,13 +129,12 @@
         <thead>
           <tr>
             <th>S.No</th>
-            <th>Photo</th>
             <th>Cust.ID</th>
             <th>Name</th>
             <th>Phone Number</th>
             <th>City</th>
             <!-- <th>Aadhar Number</th> -->
-           <!--  <th>Location</th> -->
+            <th>Location</th>
             <th>C.Date</th>
             <th>Status</th>
             <th>Actions</th>
@@ -146,14 +145,13 @@
           @foreach ($customers as $user)
           <tr>
             <td class="text-left">{{ $loop->iteration }}</td>
-
-            <td><img src="{{ asset('storage/' . $user->customer_photo) }}" alt="Image" style="width:100px; height:100px;"></td>
             <td class="text-left">{{ $user->customer_id  }}</td>
             <td class="text-left">{{ $user->initial }} {{ $user->first_name }} {{ $user->last_name }} </td>
 
             <td class="text-left">{{ $user->phone_number }}</td>
             <td class="text-left">{{ $user->city }}</td>
-
+            <!-- <td class="text-left">{{ $user->aadhar_number }}</td> -->
+            <td class="text-left">{{ getLocationName($user->location_id ) }} </td>
             <td class="text-left">{{ date('d-m-Y',strtotime($user->created_at)) }}</td>
             <td class="text-left {{ $user->status === 'Active' ? 'text-success' : ($user->status === 'Inactive' ? 'text-warning' : 'text-danger') }}">
               {{ $user->status }}

@@ -27,6 +27,7 @@
       <table class="display" id="usersTable">
       <thead>
                 <tr>
+                  <th>Image</th>
                     <th>Loan Number</th>
                     <th>Customer Name</th>
                     <th>Loan Type</th>
@@ -40,6 +41,15 @@
             <tbody>
                 @foreach($loans as $loan)
                 <tr>
+                <td>
+                    @if($loan->customer_photo!=NULL)
+                    <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
+                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+                    </a>
+                    @else
+                    No Image
+                    @endif
+                    </td>
                     <td>{{ $loan->loan_number }}</td>
                     <td>{{ $loan->customer->first_name.' '.$loan->customer->last_name }}</td>
                     <td>{{ $loan->loanType->loan_type }}</td> <!-- Ensure this line matches your LoanType model attributes -->

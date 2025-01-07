@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('customer_photo')->nullable();
             $table->string('customer_other')->nullable();
             $table->integer('tenurity')->nullable();
-
+            $table->enum('status',['Active','Released','Action'])->default('Active');
             $table->timestamps();
             $table->softDeletes();
         });

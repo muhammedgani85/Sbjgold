@@ -110,7 +110,7 @@
       <table class="table" id="usersTable">
         <thead>
           <tr>
-
+             <th>Image</th>
             <th>Loan No</th>
             <th>Cust.ID</th>
             <th>Cust.Name</th>
@@ -128,6 +128,15 @@
         <tbody>
         @foreach ( $loans as $loan)
         <tr>
+        <td>
+          @if($loan->customer_photo!=NULL)
+          <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
+           <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+          </a>
+           @else
+           No Image
+           @endif
+          </td>
           <td>{{ $loan->loan_number }}</td>
           <td>{{ $loan->customer->customer_id }}</td>
           <td>{{ $loan->customer->first_name }} {{ $loan->customer->last_name }}</td>
@@ -168,7 +177,7 @@
 
           <td>
 
-   @if($loan->status!='Rejected')
+   @if($loan->status!='Rejected' &&  $loan->status!='New')
 
           <!-- <a href="javascript:void(0);" data-id="{{ $loan->loan_number }}"  title="view"><i class='bx bx-show'></i></i></a>  -->
           <a href="{{ route('loans.customer_interest_list', $loan->loan_number) }}" title="Interest List"><i class='bx bx-list-ol'></i></a>
@@ -182,6 +191,20 @@
      title="Pay Interest">
     <i class='bx bx-rupee' style="color:red;"></i>
   </a>
+  <a  title="Action" data-bs-toggle="modal" data-bs-target="#actionModal" data-customer-number="{{ $loan->customer->customer_id }}"
+  data-loan-number="{{ $loan->loan_number }}"><i class='bx bx-message-edit'></i></a>
+  @if($loan->status!='Released')
+  <a  title="Release Loan" data-bs-toggle="modal" data-bs-target="#actionModal1" data-customer-number="{{ $loan->customer->customer_id }}"
+  data-loan-number="{{ $loan->loan_number }}" data-loan-amount="{{ $loan->total_loan_amount }}"><i class='bx bx-power-off'></i></a>
+  @endif
+
+  @if($loan->status=='Released')
+  <a  title="Reverese Loan" data-bs-toggle="modal" data-bs-target="#revokeModal" data-customer-number="{{ $loan->customer->customer_id }}"
+  data-loan-number="{{ $loan->loan_number }}" ><i class='bx bx-revision'></i></a>
+  @endif
+
+
+
   @endif
 
 
@@ -200,6 +223,93 @@
 
 
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionModalLabel">Loan Action - <span id='cust_name'></span> - <span id='loan_number'></span></h5>
+
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="actionForm" method="POST" action="{{ route('loans.action_customer') }}">
+                @csrf
+                <div class="modal-body">
+                    <!-- Action Type Field -->
+                    <div class="mb-3">
+                        <label for="action_type" class="form-label">Action Type</label>
+                        <select id='action_type' name="action_type" class="form-controller">
+                          <option value="1">First Action</option>
+                          <option value="2">Second Action</option>
+                          <option value="3">Final Action</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Hidden Fields for Loan and Customer -->
+                    <input type="hidden" name="loan_number" id="loan_number" value="">
+                    <input type="hidden" name="customer_number" id="customer_number" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Loan Release Bootstrap Modal -->
+<div class="modal fade" id="actionModal1" tabindex="-1" aria-labelledby="loanReleaseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="loanReleaseModalLabel">Loan Release Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="loanReleaseForm" action="/release-loan" method="POST">
+      @csrf
+      <!-- Loan Details in Header Section -->
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Customer Name:</strong> <input type="text"id="release_customerName" name="release_customerName" readonly>
+          </div>
+          <div class="col-md-6">
+            <strong>Loan Number:</strong> <input type="text" id="release_loanNumber" name="release_loanNumber" readonly>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-6">
+            <strong>Amount:</strong> <input type="text" id="release_loanAmount" name="release_loanAmount" readonly>
+          </div>
+          <div class="col-md-6">
+            <strong>Interest:</strong> <input type="text" id="release_loanInterest" name="release_loanInterest">
+          </div>
+        </div>
+        <hr />
+
+        <!-- Loan Release Form -->
+
+
+          <div class="mb-3">
+            <label for="waiveOff" class="form-label">Waive Off:</label>
+            <input type="text" class="form-control" name="waive_off" id="waiveOff">
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -266,6 +376,54 @@
     </div>
   </div>
 </div>
+
+
+<!-- Revoke Modal -->
+
+<!-- Modal HTML -->
+<div class="modal fade" id="revokeModal" tabindex="-1" aria-labelledby="actionModal1Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionModal1Label">Revoke Loan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="revokeLoanForm">
+                    @csrf
+                    <input type="hidden" name="revoke_loan_number" id="revoke_loan_number">
+                    <input type="hidden" name="revoke_customer_id" id="revoke_customer_id">
+
+                    <!-- Revoke Reason Dropdown -->
+                    <div class="mb-3">
+                        <label for="revokeReason" class="form-label">Revoke Reason</label>
+                        <select class="form-control" id="revokeReason" name="revoke_reason">
+                        <option value="error">Error in Loan</option>
+                        <option value="customer_request">Customer Request</option>
+                        <option value="other">Other</option>
+                        <option value="duplicate_loan">Duplicate Loan Entry</option>
+                        <option value="incorrect_amount">Incorrect Loan Amount</option>
+                        <option value="fraudulent_activity">Fraudulent Activity</option>
+                        <option value="missed_documents">Missing Documents</option>
+                        <option value="loan_disqualified">Loan Disqualified</option>
+                        <option value="legal_issue">Legal Issues</option>
+                        </select>
+                    </div>
+
+                    <!-- Remarks Field -->
+                    <div class="mb-3">
+                        <label for="remarks" class="form-label">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">Revoke Loan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
@@ -456,9 +614,159 @@ $(document).ready(function() {
 
 
 <script>
+    document.getElementById('actionModal').addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+
+        // Extract data attributes from the button
+        var loanNumber = button.getAttribute('data-loan-number');
+        var customerNumber = button.getAttribute('data-customer-number');
+
+        // Update the hidden fields in the modal form
+        document.getElementById('loan_number').value = loanNumber;
+        document.getElementById('customer_number').value = customerNumber;
+
+        document.getElementById('cust_name').innerHTML = loanNumber;
+        document.getElementById('loan_number').innerHTML = customerNumber;
+
+
+
+
+    });
+
+
+//Loan Release
+document.getElementById('actionModal1').addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+
+        // Extract data attributes from the button
+        var loanNumber = button.getAttribute('data-loan-number');
+        var customerNumber = button.getAttribute('data-customer-number');
+        var release_loanAmount = button.getAttribute('data-loan-amount');
+
+        // Update the hidden fields in the modal form
+        document.getElementById('release_loanNumber').value = loanNumber;
+        document.getElementById('release_customerName').value = customerNumber;
+        document.getElementById('release_loanAmount').value = release_loanAmount;
+
+
+
+
+
+
+    });
+
+
+
+// Loan Relased Store
+
+$('#loanReleaseForm').on('submit', function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    swal({
+        title: "Are you sure?",
+        text: "Do you want to release this loan?",
+        icon: "warning",
+        buttons: {
+            cancel: {
+                text: "Cancel",
+                value: false,
+                visible: true,
+                className: "btn-secondary",
+                closeModal: true,
+            },
+            confirm: {
+                text: "Yes, Release it!",
+                value: true,
+                visible: true,
+                className: "btn-primary",
+                closeModal: false,
+            },
+        },
+        dangerMode: true,
+    }).then((willRelease) => {
+        if (willRelease) {
+            $.ajax({
+                url: $(this).attr('action'),
+                method: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function (response) {
+                    swal("Success", "Loan has been released successfully!", "success")
+                        .then(() => {
+                            // Redirect to release letter page
+                            $('#actionModal1').modal('hide');
+                            window.open(`/release-letter/${response.loan_id}`, '_blank');
+                        });
+                },
+                error: function (xhr) {
+                    let errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message
+                        : 'Failed to release the loan.';
+                    swal("Error", errorMessage, "error");
+                },
+            });
+        }
+    });
+});
+
+
+
+$(document).ready(function() {
+    // Open the modal and pass the data
+    $('a[data-bs-toggle="modal"]').on('click', function() {
+        var customerId = $(this).data('customer-number');
+        var loanNumber = $(this).data('loan-number');
+
+        // Set values in the modal
+        $('#revoke_customer_id').val(customerId);
+        $('#revoke_loan_number').val(loanNumber);
+    });
+
+    // Handle the form submission
+    $('#revokeLoanForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent form submission
+
+        // Get form data
+        var formData = $(this).serialize();
+
+        // Confirm the action with SweetAlert
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to revoke this loan?",
+            icon: "warning",
+            buttons: ["Cancel", "Yes, Revoke it!"],
+            dangerMode: true,
+        }).then((willRevoke) => {
+            if (willRevoke) {
+                // Send the AJAX request
+                $.ajax({
+                    url: '/revoke-loan', // Update with the correct route
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        swal("Success", "Loan has been revoked successfully!", "success")
+                            .then(() => {
+                                // Close the modal
+                                $('#actionModal1').modal('hide');
+                                // Optionally reload the page or update the UI
+                                location.reload();
+                            });
+                    },
+                    error: function(xhr) {
+                        swal("Error", "Failed to revoke the loan. Please try again.", "error");
+                    }
+                });
+            }
+        });
+    });
+});
+
+
 
 
 </script>
+
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">

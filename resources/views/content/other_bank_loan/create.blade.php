@@ -26,8 +26,11 @@
           </div>
           <div id="customer_info"  style="display:none;">
 
-          <div class="input-group">
-          <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/>
+          <div class="" align="center">
+          <img id="userImage"  style="width:100px; height:100px; border-radius: 50%;" class="h-auto" alt="User Image" >
+
+
+
 
 
           </div>
@@ -346,6 +349,8 @@
                     data: { customer_number: customerNumber },
                     success: function(response) {
                     if (response.status == 'success') {
+                    const customerPhotoUrl = '/storage/' + response.data.customer_photo;
+
                     $('#initial').text(response.data.initial);
                     $('#first_name').text(response.data.first_name);
                     $('#last_name').text(response.data.last_name);
@@ -358,6 +363,7 @@
                     $('#city').text(response.data.city);
                     $('#permanent_address').text(response.data.permanent_address);
                     $('#aadhar_number ').text(response.data.aadhar_number);
+                    $('#userImage').attr('src', customerPhotoUrl);
                     $('#customer_info').show();
                     } else {
                         alert(response.message);

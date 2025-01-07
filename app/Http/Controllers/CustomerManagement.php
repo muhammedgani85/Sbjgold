@@ -122,17 +122,23 @@ class CustomerManagement extends Controller
 
         $data = $request->all();
 
+
+
         if ($request->hasFile('customer_photo')) {
-            $data['customer_photo'] = $request->file('customer_photo')->store('photos');
-        }
+          $data['customer_photo'] = $request->file('customer_photo')->store('photos', 'public');
+       }
+
+
 
         if ($request->hasFile('customer_aadharr')) {
-            $data['customer_aadharr'] = $request->file('customer_aadharr')->store('aadhar');
-        }
+          $data['customer_aadharr'] = $request->file('customer_aadharr')->store('photos', 'public');
+       }
+
+
 
         if ($request->hasFile('customer_other')) {
-            $data['customer_other'] = $request->file('customer_other')->store('documents');
-        }
+          $data['customer_other'] = $request->file('customer_other')->store('photos', 'public');
+       }
 
         Customer::create($data);
 
@@ -178,7 +184,7 @@ class CustomerManagement extends Controller
                 'marital_status' => 'required',
                 'phone_number' => 'required|digits_between:10,13',
                 'emergency_number' => 'required|digits_between:10,13',
-                'email_id' => 'nullable|email|unique:customers',
+                /* 'email_id' => 'nullable|email|unique:customers', */
                 'city' => 'required',
                 'permanent_address' => 'required',
                 'communication_address' => 'required',
@@ -212,19 +218,25 @@ class CustomerManagement extends Controller
 
             $data = $request->all();
 
-            if ($request->hasFile('customer_photo')) {
-                $data['customer_photo'] = $request->file('customer_photo')->store('photos');
-            }
 
-            if ($request->hasFile('customer_aadharr')) {
-                $data['customer_aadharr'] = $request->file('customer_aadharr')->store('aadhar');
-            }
+        if ($request->hasFile('customer_photo')) {
+          $data['customer_photo'] = $request->file('customer_photo')->store('photos', 'public');
+       }
 
-            if ($request->hasFile('customer_other')) {
-                $data['customer_other'] = $request->file('customer_other')->store('documents');
-            }
+
+
+        if ($request->hasFile('customer_aadharr')) {
+          $data['customer_aadharr'] = $request->file('customer_aadharr')->store('photos', 'public');
+       }
+
+
+
+        if ($request->hasFile('customer_other')) {
+          $data['customer_other'] = $request->file('customer_other')->store('photos', 'public');
+       }
+
             $customer = Customer::findOrFail($id);
-            $customer->update($request->all());
+            $customer->update($data);
 
             return response()->json(['success' => 'Customer updated successfully']);
         } catch (Exception $e) {

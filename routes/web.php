@@ -55,15 +55,19 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\InterestPayment;
 use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\AttendanceReportController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ExpensesReportController;
 use App\Http\Controllers\LeaveReportController;
 use App\Http\Controllers\CustomerReportController;
 use App\Http\Controllers\TeleCallerController;
 use App\Http\Controllers\TelecallerFollowController;
 use App\Http\Controllers\FundController;
+use App\Http\Controllers\LoanReport;
 use App\Http\Controllers\OtherBankLoanController;
 use App\Http\Controllers\TodayBusinessReport;
 use App\Models\OtherBankLoan;
+use App\Http\Controllers\LoanActionController;
+
 
 // Main Page Route
 Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
@@ -220,6 +224,13 @@ Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show')
 Route::get('/loans/approvalview/{loan_number}', [LoanController::class, 'approvalView'])->name('loans.approvalview');
 Route::get('/loans/dispatchview/{loan_number}', [LoanController::class, 'dispatchview'])->name('loans.dispatchview');
 
+// Loan Release
+
+Route::post('/release-loan', [LoanController::class, 'releaseLoan'])->name('release-loan');
+Route::get('/release-letter/{id}', [LoanController::class, 'releaseLetter'])->name('release-letter');
+Route::post('/revoke-loan', [LoanController::class, 'revokeLoan'])->name('revoke.loan');
+
+
 
 
 //Route::get('/loans', [LoanManagement::class, 'index'])->name('loans');
@@ -272,4 +283,43 @@ Route::any('/other-bank-interest', [OtherBankLoanController::class, 'interestRem
 
 //Today Business Report
 Route::resource('today_business', TodayBusinessReport::class);
-Route::any('/today_business', [TodayBusinessReport::class, 'index'])->name('today_business.index');
+Route::any('/today_business_custom', [TodayBusinessReport::class, 'index'])->name('today_business_custom.index');
+
+
+
+//Loan Reports
+Route::resource('loan_report', LoanReport::class);
+Route::any('/loan_report', [LoanReport::class, 'index'])->name('today_business.index');
+
+Route::resource('loan_action', LoanActionController::class);
+Route::get('loan_action/{loan_number}', [LoanActionController::class, 'showInterestForm'])->name('loans.customer_interest_list');
+Route::post('loan_action/{loan_number}', [LoanActionController::class, 'storeInterestAction']);
+Route::post('action_customer', [LoanActionController::class, 'ActionCustomer'])->name('loans.action_customer');
+
+
+//Loan Report
+
+Route::get('loan_report', [LoanReport::class, 'index'])->name('loan_report.index');
+
+Route::get('sh_loan_report', [LoanReport::class, 'sh_loan_report'])->name('loan_report.sh_loan_report');
+
+
+//Trending Routes
+
+Route::get('loan-trends', [LoanController::class, 'loanTrends'])->name('loan.trends');
+Route::get('/loan-chart-data', [LoanController::class, 'getLoanChartData'])->name('loan.chart.data');
+Route::get('/loan-wave-chart', [LoanController::class, 'getLoanWaveData'])->name('loan.wave.data');
+
+
+//Branch List
+
+
+
+Route::resource('branch', BranchController::class);
+Route::any('/branch', [BranchController::class, 'index'])->name('branch.index');
+Route::delete('/branch/softDelete/{id}', [BranchController::class, 'softDelete'])->name('branch.softDelete');
+Route::any('branch/create', [BranchController::class, 'create'])->name('branch.create');
+Route::any('branch/store', [BranchController::class, 'store'])->name('branch.store');
+//Route::any('/branch/update', [BranchController::class, 'update'])->name('branch.update');
+
+Route::post('/branch/{branch}', [BranchController::class, 'update'])->name('branch.update');

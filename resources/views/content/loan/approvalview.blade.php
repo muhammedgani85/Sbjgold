@@ -17,8 +17,14 @@
           <div id="customer_info">
 
           <div class="input-group">
-          <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/>
 
+          @if($loan->customer->customer_photo!=NULL)
+
+          <img src="{{ asset('storage/' . $loan->customer->customer_photo) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+
+          @else
+          No Image
+          @endif
 
           </div>
 
@@ -152,19 +158,21 @@
         <div class="card-body demo-vertical-spacing demo-only-element">
 
         <div class="input-group">
-          @if($loan->customer_photo)
-          <img src="{{ asset('storage/photos/lOaImYU6oqX3S7nsWqRlOhOClq5tsemwuCvQGUZH.png') }}" alt="Your Image">
-          @else
-              No Photo Available
-          @endif
+        @if($loan->customer_other!=NULL)
+
+                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+
+                    @else
+                    No Image
+                    @endif
           </div>
 
 
 
-          <div class="input-group">
+          <!-- <div class="input-group">
             <label class="input-group-text" for="document">Others</label>
             <img src="" />
-          </div>
+          </div> -->
 
           <div class="input-group">
           <input type="radio" id="approved" name="status" value="Approved"> &nbsp;<span style="color:green;">Approved</span> &nbsp;&nbsp;&nbsp;

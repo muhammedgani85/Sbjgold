@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Expense;
 use App\Models\Loan;
 use App\Models\LoanInterestPayment;
+use App\Models\LoanRelease;
 use App\Models\OtherBankLoan;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,8 @@ class TodayBusinessReport extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+
+     public function index(Request $request)
     {
       $location = session('user_data')->location;
 
@@ -39,11 +41,17 @@ class TodayBusinessReport extends Controller
           ->first();
 
       // Query for total loans up to today
-      $totalLoans = Loan::whereDate('created_at', '<=', $date)
+      $totalLoans = Loan::whereDate('created_at', '=', $date)
           ->when($locationId, function ($query) use ($locationId) {
               return $query->where('location_id', $locationId);
           })
-          ->selectRaw('COUNT(*) as total_loans, SUM(total_loan_amount) as total_amount, SUM(jewel_net_grams) as upto_total_grams, SUM(document_charge) as total_document_charges')
+          ->selectRaw('
+        COUNT(*) as total_loans,
+        SUM(total_loan_amount) as total_amount,
+        SUM(jewel_net_grams) as upto_total_grams,
+        SUM(document_charge) as total_document_charges,
+        SUM(CASE WHEN DATE(created_at) = ? THEN total_loan_amount ELSE 0 END) as today_total_amount,
+        COUNT(CASE WHEN DATE(created_at) = ? THEN 1 ELSE NULL END) as today_total_loans', [$date, $date])
           ->first();
 
       // Query for today's expenses
@@ -73,6 +81,22 @@ class TodayBusinessReport extends Controller
           )
           ->first();
 
+
+
+      // Loan Released
+
+      $loanRelease = LoanRelease::join('loans', 'loans.loan_number', '=', 'loan_releases.loan_number')
+          ->when($locationId, function ($query) use ($locationId) {
+              return $query->where('loans.location_id', $locationId);
+          })
+          ->selectRaw(
+              'SUM(loans.jewel_net_grams) as total_grams,
+               SUM(loan_releases.amount) as total_amount,
+               SUM(loan_releases.interest) as total_interest,
+               COUNT(loan_releases.id) as total_loans'
+          )
+          ->first();
+
       // Combine all data into the report
       $dailyReport = [
           'new_loans' => [
@@ -97,6 +121,11 @@ class TodayBusinessReport extends Controller
               'amount' => $otherBankLoans->total_amount ?? 0,
               'other_bank_document_charges' => $otherBankLoans->other_bank_document_charges ?? 0,
           ],
+          'loan_release' => [
+            'amount' => $loanRelease->total_amount + $loanRelease->total_interest ?? 0,
+            'total_grams' => $loanRelease->total_grams ?? 0,
+
+           ],
           'today_expenses' => $todayExpenses,
           'interest_received' => $interestReceived,
       ];
