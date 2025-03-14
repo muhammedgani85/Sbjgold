@@ -29,4 +29,3 @@ class LoanInterestPayment extends Model
       return $this->belongsTo(LoanInterest::class);
   }
 }
-}

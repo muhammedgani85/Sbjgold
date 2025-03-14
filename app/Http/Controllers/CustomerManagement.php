@@ -26,7 +26,16 @@ class CustomerManagement extends Controller
     {
         $location = session('user_data')->location;
 
-        $customers = Customer::orderBy('id', 'DESC')->where('location_id', $location)->get();
+      $role = session('user_data')->role;
+      $is_check = AttendanceController::check_role($role);
+
+      if($is_check){
+
+        $customers = Customer::orderBy('id', 'DESC')->where('status','Active')->get();
+      }else{
+        $customers = Customer::orderBy('id', 'DESC')->where('location_id', $location)->where('status','Active')->get();
+
+      }
 
         $totalCustomers = $customers->count();
 
@@ -39,7 +48,7 @@ class CustomerManagement extends Controller
         // Count customers added this month
         $monthCustomers = $customers->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
 
-        return view('content.customermanagement.dashboard', compact('customers', 'todayCustomers', 'weekCustomers', 'monthCustomers'));
+        return view('content.customermanagement.index', compact('customers', 'todayCustomers', 'weekCustomers', 'monthCustomers'));
     }
 
     /**
@@ -78,25 +87,25 @@ class CustomerManagement extends Controller
     {
         $validator = Validator::make($request->all(), [
             'customer_id' => 'required|unique:customers',
-            'initial' => 'required|max:2',
+           /*  'initial' => 'required|max:2', */
             'first_name' => 'required',
-            'last_name' => 'required',
-            'father_name' => 'nullable',
+           /*  'last_name' => 'required', */
+           /*  'father_name' => 'nullable',
             'spouse_name' => 'nullable',
             'gender' => 'required',
             'dob' => 'required|date',
-            'marital_status' => 'required',
+            'marital_status' => 'required', */
             'phone_number' => 'required|digits_between:10,13',
             'emergency_number' => 'required|digits_between:10,13',
-            'email_id' => 'nullable|email|unique:customers',
+           /*  'email_id' => 'nullable|email|unique:customers', */
             'city' => 'required',
             'permanent_address' => 'required',
-            'communication_address' => 'required',
+            /* 'communication_address' => 'required', */
             'ward' => 'nullable',
-            'aadhar_number' => 'required|digits:16|unique:customers',
+            'aadhar_number' => 'required|digits:12|unique:customers',
             'driving_license_number' => 'nullable',
             'pan' => 'nullable',
-            'occupation_id' => 'required|exists:occupation_models,id',
+           /*  'occupation_id' => 'required|exists:occupation_models,id', */
             /* 'occupation_type' => 'required', */
             /* 'job_type_details' => 'required', */
             'r_name' => 'nullable',
@@ -122,21 +131,35 @@ class CustomerManagement extends Controller
 
         $data = $request->all();
 
+
+
         if ($request->hasFile('customer_photo')) {
-            $data['customer_photo'] = $request->file('customer_photo')->store('photos');
-        }
+          $data['customer_photo'] = $request->file('customer_photo')->store('photos', 'public');
+       }
+
+
 
         if ($request->hasFile('customer_aadharr')) {
-            $data['customer_aadharr'] = $request->file('customer_aadharr')->store('aadhar');
-        }
+          $data['customer_aadharr'] = $request->file('customer_aadharr')->store('photos', 'public');
+       }
+
+
 
         if ($request->hasFile('customer_other')) {
-            $data['customer_other'] = $request->file('customer_other')->store('documents');
-        }
+          $data['customer_other'] = $request->file('customer_other')->store('photos', 'public');
+       }
 
-        Customer::create($data);
+       try {
+        $customer = Customer::create($data);
 
+        if ($customer) {
         return response()->json(['success' => 'Customer created successfully']);
+        } else {
+        return response()->json(['error' => 'Failed to create customer'], 500);
+        }
+        } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 
@@ -168,25 +191,25 @@ class CustomerManagement extends Controller
 
             $validator = Validator::make($request->all(), [
                 'customer_id' => 'required',
-                'initial' => 'required|max:2',
+                /* 'initial' => 'required|max:2', */
                 'first_name' => 'required',
-                'last_name' => 'required',
+                /* 'last_name' => 'required',
                 'father_name' => 'nullable',
                 'spouse_name' => 'nullable',
                 'gender' => 'required',
                 'dob' => 'required|date',
-                'marital_status' => 'required',
+                'marital_status' => 'required', */
                 'phone_number' => 'required|digits_between:10,13',
                 'emergency_number' => 'required|digits_between:10,13',
-                'email_id' => 'nullable|email|unique:customers',
+                /* 'email_id' => 'nullable|email|unique:customers', */
                 'city' => 'required',
                 'permanent_address' => 'required',
-                'communication_address' => 'required',
+               /*  'communication_address' => 'required', */
                 'ward' => 'nullable',
-                'aadhar_number' => 'required|digits:16',
-                'driving_license_number' => 'nullable',
-                'pan' => 'nullable',
-                'occupation_id' => 'required|exists:occupation_models,id',
+                'aadhar_number' => 'required|digits:12',
+              /*   'driving_license_number' => 'nullable',
+                'pan' => 'nullable', */
+               /*  'occupation_id' => 'required|exists:occupation_models,id', */
                 /* 'occupation_type' => 'required', */
                 /* 'job_type_details' => 'required', */
                 'r_name' => 'nullable',
@@ -212,21 +235,34 @@ class CustomerManagement extends Controller
 
             $data = $request->all();
 
-            if ($request->hasFile('customer_photo')) {
-                $data['customer_photo'] = $request->file('customer_photo')->store('photos');
-            }
 
-            if ($request->hasFile('customer_aadharr')) {
-                $data['customer_aadharr'] = $request->file('customer_aadharr')->store('aadhar');
-            }
+        if ($request->hasFile('customer_photo')) {
+          $data['customer_photo'] = $request->file('customer_photo')->store('photos', 'public');
+       }
 
-            if ($request->hasFile('customer_other')) {
-                $data['customer_other'] = $request->file('customer_other')->store('documents');
-            }
+
+
+        if ($request->hasFile('customer_aadharr')) {
+          $data['customer_aadharr'] = $request->file('customer_aadharr')->store('photos', 'public');
+       }
+
+
+
+        if ($request->hasFile('customer_other')) {
+          $data['customer_other'] = $request->file('customer_other')->store('photos', 'public');
+       }
+
             $customer = Customer::findOrFail($id);
-            $customer->update($request->all());
+            $updated = $customer->update($data);
 
-            return response()->json(['success' => 'Customer updated successfully']);
+
+
+
+            if ($updated) {
+               return response()->json(['success' => 'Customer updated successfully']);
+            } else {
+               return response()->json(['error' => 'Failed to update customer'], 500);
+            }
         } catch (Exception $e) {
             Log::debug($e->getMessage());
         }

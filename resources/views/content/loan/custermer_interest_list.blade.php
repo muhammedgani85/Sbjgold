@@ -29,7 +29,7 @@ use Carbon\Carbon;
           <tr>
 
             <th>Loan No</th>
-            <th>Month</th>
+
             <th>Interest Amount</th>
             <th>Payment Method</th>
             <th>Paid Date</th>
@@ -44,18 +44,12 @@ use Carbon\Carbon;
 
           <tr>
             <td>{{ isset($list->loan_id)?$list->loan_id:"" }} </td>
-            <td>
-              @php
 
-              $monthNumber = isset($list->month)?$list->month:""; // Example month number
-              $monthName = Carbon::createFromFormat('m', $monthNumber)->format('F');
-              @endphp
-              {{ $monthName }} </td>
             <td>{{ isset($list->interest_amount)?$list->interest_amount:"" }} </td>
             <td>{{ isset($list->payment_method)?$list->payment_method:"" }} </td>
             <td>{{ isset($list->created_at)?$list->created_at:"" }} </td>
             <td><a href="{{ route('loans.interest_invoice', ['loan_id' => $list->loan_id]) }}?month={{ $list->month }}" target="_blank">
-    View
+    Receipt
 </a></td>
           </tr>
 

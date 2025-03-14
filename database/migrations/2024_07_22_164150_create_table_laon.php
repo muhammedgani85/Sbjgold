@@ -19,6 +19,7 @@ return new class extends Migration
         $table->unsignedBigInteger('loan_type_id');
         $table->decimal('jewel_grams', 8, 2);
         $table->decimal('jewel_net_grams', 8, 2);
+        $table->enum('jewel_quality',['916','22ct','Other'])->default('916');
         $table->decimal('additional_cost', 15, 2)->nullable();
         $table->decimal('total_loan_amount', 15, 2)->nullable();
         $table->decimal('total_interest_amount', 15, 2)->nullable();

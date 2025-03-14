@@ -36,6 +36,7 @@ table tr th {
   font-weight: bold;
 }
 #layout-menu {
-  background-color: #cbc3e3 !important;
-  color: #fff !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  font-weight: bolder;
 }

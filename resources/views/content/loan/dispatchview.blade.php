@@ -17,8 +17,8 @@
           <div id="customer_info">
 
           <div class="input-group">
-          <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/>
-
+          <!-- <img src="{{asset('assets/images/sj_logo.png')}}" style ="width:200px;height:50px;" class="h-auto rounded-circle"/> -->
+          <img src="{{ asset('storage/' . $loan->customer->customer_photo) }}" alt="Image" style="width:50px; height:50px;">
 
           </div>
 
@@ -148,27 +148,9 @@
     <!-- Speech To Text -->
     <div class="col-md-12">
       <div class="card mb-12">
-        <h5 class="card-header">Documents</h5>
+        <h5 class="card-header">Payment Type</h5>
         <div class="card-body demo-vertical-spacing demo-only-element">
 
-        <div class="input-group">
-          @if($loan->customer_photo)
-          <img src="{{ asset('storage/photos/lOaImYU6oqX3S7nsWqRlOhOClq5tsemwuCvQGUZH.png') }}" alt="Your Image">
-          @else
-              No Photo Available
-          @endif
-          </div>
-
-
-
-          <div class="input-group">
-            <label class="input-group-text" for="document">Others</label>
-            <img src="" />
-          </div>
-
-
-
-          <label>Payment Type : </label>
           <div class="input-group">
 
           <input type="radio" id="cash" name="status" value="cash"> &nbsp;<span style="color:green;">Cash</span> &nbsp;&nbsp;&nbsp;
@@ -316,6 +298,7 @@
     $('#submitStatus').click(function() {
         // Get selected radio button value
         var status = $('input[name="status"]:checked').val();
+        var loan_number = $('#loan_number').val();
 
         if (!status) {
             Swal.fire({
@@ -353,6 +336,9 @@
                             'The loan status has been updated.',
                             'success'
                         );
+
+
+                        window.open(`/new_release-letter/${loan_number}`, '_blank');
                     },
                     error: function(xhr, status, error) {
                         Swal.fire(

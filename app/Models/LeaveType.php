@@ -15,4 +15,5 @@ class LeaveType extends Model
     {
         return $this->hasMany(Leave::class);
     }
+
 }

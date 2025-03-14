@@ -15,4 +15,8 @@ class Expense extends Model
     {
         return $this->belongsTo(OfficeExpenseType::class);
     }
+    public function branch()
+{
+    return $this->belongsTo(Branch::class, 'location');
+}
 }

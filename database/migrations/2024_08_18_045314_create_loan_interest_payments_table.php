@@ -19,8 +19,8 @@ return new class extends Migration
           $table->decimal('interest_amount', 8, 2);
           $table->string('payment_method');
           $table->string('user_id')->nullable();
-
           $table->timestamps();
+          $table->softDeletes();
 
           // Define the foreign key constraints
           //$table->foreign('loan_id')->references('id')->on('loans')->onDelete('cascade');

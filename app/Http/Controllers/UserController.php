@@ -9,6 +9,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\LoanHelper;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 
 class UserController extends Controller
@@ -18,12 +21,19 @@ class UserController extends Controller
      */
     public function index()
     {
+
+      $location = session('user_data')->location;
+      $role = session('user_data')->role;
+      $is_check = AttendanceController::check_role($role);
+
+      if($is_check){
         $users = User::orderBy('id', 'DESC')->get();
+      }else{
+        $users = User::where('location',$location)->orderBy('id', 'DESC')->get();
+      }
 
 
-
-
-        return view('content.usersmanagement.dashboard', compact('users'));
+        return view('content.usersmanagement.index', compact('users'));
     }
 
     /**
@@ -68,19 +78,22 @@ class UserController extends Controller
                 'user_name' => 'required',
                 'password' => 'required',
                 'emp_id' => 'required',
-                /* 'document' => 'required|file|mimes:jpg,png,pdf,docx', */
+                'employee_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-            if ($request->hasFile('document')) {
-                $filePath = $request->file('document')->store('uploads', 'public');
-                $validated['file_path'] = $filePath;
-                $user->document = $filePath;
-            }
-            // Create the employee
             $data = $request->all();
+
+            if ($request->hasFile('employee_image')) {
+              $data['document'] = $request->file('employee_image')->store('photos', 'public');
+            }
+
+
+
+            // Create the employee
+
             $employee = User::create($data);
 
             // Return success response
@@ -136,6 +149,7 @@ class UserController extends Controller
             /*  'password' => 'required', */
             /* 'emp_id' => 'required', */
             /* 'document' => 'required|file|mimes:jpg,png,pdf,docx', */
+            'employee_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
 
@@ -145,6 +159,16 @@ class UserController extends Controller
             $employee->password = bcrypt($request->password);
             $employee->save();
         }
+
+
+
+
+        if ($request->hasFile('employee_image')) {
+             $employee->document = $request->file('employee_image')->store('photos', 'public');
+        }
+
+
+
         $employee->update($request->all());
 
         return response()->json(['success' => 'Employee information updated successfully.']);
@@ -193,4 +217,19 @@ class UserController extends Controller
             'location_code' => $location->branch_prefix // Assuming 'code' is the column name
         ]);
     }
+
+   public function logout(Request $request){
+
+
+        Auth::logout(); // Log out the user
+        Session::flush(); // Clear all session data
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
+
+
+   }
+
 }

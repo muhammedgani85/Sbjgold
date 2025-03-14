@@ -15,14 +15,15 @@
 
         <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Customer</label>
-            <select class="form-select" id="customer_number" name="customer_number">
+            <input type="text" class="form-control" id="customer_number" name="customer_number">
+           <!--  <select class="form-select" id="customer_number" name="customer_number">
               <option selected>Choose...</option>
               @foreach ($customer as $cus )
-              <option value="{{ $cus->id }}">{{ $cus->customer_id . ' -'.$cus->first_name.' '.$cus->first_name }}</option>
+              <option value="{{ $cus->id }}">{{ $cus->customer_id . ' -'.$cus->first_name }}</option>
 
               @endforeach
 
-            </select>
+            </select> -->
           </div>
           <div id="customer_info"  style="display:none;">
 
@@ -119,40 +120,103 @@
           </select>
           </div>
 
+          <div class="form-group">
+          <label for="interest_type_id">Jewel Quality</label>
+          <select class="form-control" id="jewel_quality" name="jewel_quality">
+          <option selected>Choose...</option>
+          <option value="916">916</option>
+          <option value="22ct">22ct</option>
+          <option value="Other">Others</option>
+
+          </select>
+          </div>
+
+          <div class="form-group">
+          <label for="interest_type_id">Jewel Type</label>
+          <select class="form-control" id="jewel_type" name="jewel_type">
+          <option selected value="0">Choose...</option>
+            <option value="Chain">Chain</option>
+            <option value="Ring">Ring</option>
+            <option value="Bangle">Bangle</option>
+            <option value="Bracelet">Bracelet</option>
+            <option value="Necklace">Necklace</option>
+            <option value="Pendant">Pendant</option>
+            <option value="Earrings">Earrings</option>
+            <option value="Nose Ring">Nose Ring</option>
+            <option value="Anklet">Anklet</option>
+            <option value="Toe Ring">Toe Ring</option>
+            <option value="Mangalsutra">Mangalsutra</option>
+            <option value="Armlet">Armlet</option>
+            <option value="Gold Coin">Gold Coin</option>
+            <option value="Gold Bar">Gold Bar</option>
+            <option value="Waist Belt">Waist Belt</option>
+            <option value="Hair Ornament">Hair Ornament</option>
+            <option value="Other">Other</option>
+
+
+          </select>
+          </div>
+
           <div class="form-group" id="jewel_grams_group1">
-            <label for="jewel_grams">Jewel Net Grams</label>
+            <label for="jewel_grams">Gross Weight</label>
             <input type="number" name="jewel_net_grams" id="jewel_net_grams" class="form-control">
         </div>
 
-
+<!-- Multile Entry -->
           <div class="form-group" id="jewel_grams_group">
-            <label for="jewel_grams">Jewel Grams</label>
-            <input type="number" name="jewel_grams" id="jewel_grams" class="form-control">
-        </div>
+          <label for="jewel_grams">Net Grams</label>
+          <input type="number" name="jewel_grams" id="jewel_grams" class="form-control">
+          </div>
 
+
+
+          <button type="button" id="add_jewel" class="btn btn-primary">Add</button>
+
+          <table class="table mt-3" style="border: 1px solid #000;">
+          <thead  style="background-color: lightgrey;">
+          <tr>
+          <th>Quality</th>
+          <th>Type</th>
+          <th>Net Grams</th>
+          <th>Grams</th>
+          <th>Action</th>
+          </tr>
+          </thead>
+          <tbody id="jewel_table_body"></tbody>
+</table>
+
+<!-- Multiple Entry Close -->
+  <input type="hidden" id="jewel_entries" name="jewel_entries"/>
 
         <div class="form-group">
             <label for="total_loan_amount">Total Loan Amount</label>
-            <input type="text" class="form-control" id="total_loan_amount" name="total_loan_amount" readonly>
+            <input type="text" class="form-control" id="total_loan_amount" name="total_loan_amount">
         </div>
         <div class="form-group">
             <label for="total_interest_amount">Total Interest Amount <span style="color:red !important;">( Include Round Off)</span></label>
-            <input type="text" class="form-control" id="total_interest_amount" name="total_interest_amount" readonly>
+            <input type="text" class="form-control" id="total_interest_amount" name="total_interest_amount">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="display: none;">
             <label for="per_month_payable_amount">Per Month Payable Amount</label>
             <input type="text" class="form-control" id="per_month_payable_amount" name="per_month_payable_amount" readonly>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="display: none;">
             <label for="per_month_payable_amount">Total Amount <span style="color:red;">(Include interest)</span></label>
             <input type="text" class="form-control" id="total_include_int_amount" name="total_include_int_amount" readonly>
         </div>
 
         <div class="form-group">
             <label for="per_month_payable_amount">Document Charge</label>
-            <input type="text" class="form-control" id="document_charge" name="document_charge" readonly>
+            <input type="text" class="form-control" id="document_charge" name="document_charge" value="0">
             <input type="hidden" class="form-control" id="location_id" name="location_id" value="{{ $location }}">
+        </div>
+
+        <div class="form-group">
+            <label for="per_month_payable_amount">Remarks</label>
+            <textarea class="form-control" id="remarks" name="remarks" ></textarea>
+            <span style="color:red;">Max allowed 255 Character</span>
+
         </div>
 
         </div>
@@ -327,7 +391,7 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-        $('#customer_number').change(function() {
+        $('#customer_number').keyup(function() {
             var customerNumber = $(this).val();
             if (customerNumber) {
                 $.ajax({
@@ -397,11 +461,11 @@
                     if (loanTypeId == 1) { // Gold Loan
                         $('#jewel_grams_group').show();
                         $('#jewel_grams_group1').show();
-                        $('#total_loan_amount').prop('readonly', true);
+                       // $('#total_loan_amount').prop('readonly', true);
                     } else { // Other loan types
                         $('#jewel_grams_group').hide();
                         $('#jewel_grams_group1').hide();
-                        $('#total_loan_amount').prop('readonly', false);
+                       // $('#total_loan_amount').prop('readonly', false);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -452,16 +516,16 @@
                     var perMonthPayableAmount = (totalLoanAmount + totalInterestAmount) / months;
 
                     $('#loan_amount').val(loanAmount.toFixed(2));
-                    $('#total_loan_amount').val(totalLoanAmount.toFixed(2));
+                  //  $('#total_loan_amount').val(totalLoanAmount.toFixed(2));
                     if(totalInterestAmount < 100){
-                      $('#total_interest_amount').val(100);
+                    //  $('#total_interest_amount').val(100);
                     }else{
-                      $('#total_interest_amount').val(totalInterestAmount);
+                      //$('#total_interest_amount').val(totalInterestAmount);
                     }
-                    $('#total_interest_amount').val(totalInterestAmount);
+                  //  $('#total_interest_amount').val(totalInterestAmount);
                     $('#per_month_payable_amount').val(roundUpToNearest10(perMonthPayableAmount.toFixed(2)));
                     $('#total_include_int_amount').val(totalLoanAmount + totalInterestAmount);
-                    $('#document_charge').val(response.document_charge);
+                   // $('#document_charge').val(response.document_charge);
 
 
                 }
@@ -606,6 +670,63 @@
 
     });
 </script>
+
+
+<script>
+    let jewelData = [];
+
+    $("#add_jewel").click(function() {
+        let quality = $("#jewel_quality").val();
+        let netGrams = $("#jewel_net_grams").val();
+        let grams = $("#jewel_grams").val();
+        let jewel_type = $("#jewel_type").val();
+
+        if (quality === "Choose..." || netGrams === "" || grams === "") {
+            alert("All fields are required!");
+            return;
+        }
+
+        let entry = { quality, netGrams, grams ,jewel_type};
+        jewelData.push(entry);
+        updateTable();
+    });
+
+    function updateTable() {
+        $("#jewel_table_body").html("");
+        jewelData.forEach((item, index) => {
+            $("#jewel_table_body").append(`
+                <tr>
+                    <td>${item.quality}</td>
+                    <td>${item.jewel_type}</td>
+                    <td>${item.netGrams}</td>
+                    <td>${item.grams}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" onclick="editJewel(${index})"><i class="bx bx-pencil me-1"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteJewel(${index})"><i class="bx bx-trash me-1"></i></button>
+                    </td>
+                </tr>
+            `);
+        });
+
+        $("#jewel_entries").val(JSON.stringify(jewelData));
+    }
+
+    function editJewel(index) {
+        let item = jewelData[index];
+        $("#jewel_quality").val(item.quality);
+        $("#jewel_net_grams").val(item.netGrams);
+        $("#jewel_grams").val(item.grams);
+        $("#jewel_type").val(item.jewel_type);
+        deleteJewel(index);
+    }
+
+    function deleteJewel(index) {
+        jewelData.splice(index, 1);
+        updateTable();
+    }
+</script>
+
+
 <!-- SweetAlert CSS -->
 <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.min.css">
 

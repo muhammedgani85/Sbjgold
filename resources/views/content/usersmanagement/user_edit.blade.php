@@ -176,7 +176,7 @@
 
                     <div class="input-group">
                         <label class="input-group-text" for="document">Upload</label>
-                        <input type="file" class="form-control" id="document" name="document">
+                        <input type="file" class="form-control" id="employee_image" name="employee_image">
                     </div>
                 </div>
             </div>

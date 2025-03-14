@@ -51,6 +51,7 @@
                 <th>Months</th>
                 <th>Status</th>
                 <th>Loan Type</th>
+                <th>Action</th>
 
           </tr>
         </thead>
@@ -63,6 +64,11 @@
                     <td>{{ $loanInterest->months }}</td>
                     <td>{{ $loanInterest->status ? 'Active' : 'Inactive' }}</td>
                     <td>{{ $loanInterest->loanType->loan_type }}</td>
+                    <td>
+                    <a href="{{ route('loan_interests.edit', $loanInterest->id) }}" title="Edit">
+            <i class="bx bx-pencil me-1"></i>
+        </a>
+                    </td>
                 </tr>
             @endforeach
         </tbody>

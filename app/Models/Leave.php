@@ -40,4 +40,12 @@ class Leave extends Model
     {
         return $this->belongsTo(LeaveReason::class, 'reason');
     }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'location');
+    }
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 }

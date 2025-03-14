@@ -18,5 +18,44 @@ class Customer extends Model
     {
         return $this->hasMany(Loan::class, 'customer_id');
     }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'location_id');
+    }
+
+    public function loan()
+{
+    return $this->hasOne(Loan::class, 'customer_id'); // Adjust foreign key if needed
+}
+
+public function getUnpaidInterestMonthsAttribute()
+{
+  $loan = $this->loan;
+
+  if (!$loan) {
+      return []; // No loan found, return empty array
+  }
+
+  // Get the created date of the loan
+  $loanCreatedDate = $loan->created_at;
+  // Get the current month and year
+  $currentDate = now();
+
+  // Generate a list of all months from loan creation to current month
+  $months = [];
+  for ($date = $loanCreatedDate; $date <= $currentDate; $date->addMonth()) {
+      $months[] = $date->format('Y-m'); // Format as Year-Month (e.g., 2024-11)
+  }
+
+  // Get paid months from the loan_interest_payments table
+  $paidMonths = LoanInterestPayment::where('loan_id', $loan->loan_number)
+      ->pluck('month')
+      ->toArray();
+
+  // Filter unpaid months
+  $unpaidMonths = array_diff($months, $paidMonths);
+
+  return $unpaidMonths;
+}
 
 }

@@ -160,7 +160,7 @@
             </td>
             <td>
               <div class="dropdown">
-                <a href="http://127.0.0.1:8000/users/2/edit" title="Approved" onclick="approveLeave('{{ $leave->id }}')"><i class='bx bx-check'></i></a>
+                <a href="javascript:void(0);" title="Approved" onclick="approveLeave('{{ $leave->id }}')"><i class='bx bx-check'></i></a>
                 <a href="javascript:void(0);" data-id="2" class="btn-delete" title="Cancel" onclick="cancelLeave('{{ $leave->id }}')"><i class='bx bx-x'></i></a>
 
                 <a href="javascript:void(0);" title="withdraw" onclick="withdrawLeave('{{ $leave->id }}')"><i class='bx bx-crop'></i></a>

@@ -47,8 +47,22 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Roles::class);
     }
-    public function attendance()
+    /* public function attendance()
     {
         return $this->hasMany(Attendance::class);
+    } */
+
+    public function attendance(){
+      return $this->hasMany(Attendance::class, 'employee_id');
+      }
+
+    public function branch() {
+    return $this->belongsTo(Branch::class, 'location', 'id');
     }
+
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class, 'employee_id');
+    }
+
 }

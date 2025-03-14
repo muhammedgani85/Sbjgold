@@ -105,7 +105,17 @@
   </div>
 
   <!-- Month Filter -->
+  @if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 
   <!-- Form controls -->
   <div class="card">
@@ -137,14 +147,14 @@
                 $isHoliday = $publicHolidays->firstWhere('date', $date->toDateString());
                 $isSunday = $date->isSunday();
 
-                if ($attendanceForDay || $isHoliday || $isSunday) {
+                if ($attendanceForDay || $isHoliday) {
                 $presentDays++;
                 }
 
                 @endphp
 
                 <td class="{{ trim($isHoliday ? 'holiday' : '') }} {{ trim($isSunday ? 'sunday' : '') }}">
-                  <input type="checkbox" name="attendance[{{ $employee->id }}][{{ $date->toDateString() }}]" {{ $attendanceForDay || $isHoliday || $isSunday ? 'checked' : '' }} {{ $isHoliday || $isSunday ? 'disabled' : '' }}>
+                  <input type="checkbox" name="attendance[{{ $employee->id }}][{{ $date->toDateString() }}]" {{ $attendanceForDay || $isHoliday ? 'checked' : '' }} {{ $isHoliday  ? 'disabled' : '' }}>
                 </td>
                 @endfor
                 <td>{{ $presentDays }}</td>

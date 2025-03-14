@@ -159,7 +159,7 @@
           <td class="text-left {{ $leave->status === 'Pending' ? 'text-danger' : ($leave->status === 'Approved' ? 'text-success' : 'text-warning') }}">
             {{ $leave->status }}
           </td>
-          <td>{{ getUserName($leave->approved_by) }} </td>
+          <td>Admin </td>
         </tr>
 
         @endforeach
