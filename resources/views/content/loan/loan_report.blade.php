@@ -116,9 +116,10 @@
             <th>Cust.Name</th>
             <th>Location</th>
             <th>Loan Amount</th>
-           <!--  <th>Type</th> -->
+            <th>J.Grms</th>
+            <th>J.Net Grms</th>
             <th>Int.Scheme</th>
-            <th>Int / Month</th>
+            <!-- <th>Int / Month</th> -->
             <th>L.Date</th>
             <th>Status</th>
 
@@ -126,53 +127,58 @@
         </thead>
 
         <tbody>
-        @foreach ( $loans as $loan)
-        <tr>
-          <td>{{ $loan->loan_number }}</td>
-          <td>{{ $loan->customer->customer_id }}</td>
-          <td>{{ $loan->customer->first_name }} {{ $loan->customer->last_name }}</td>
-          <td>{{ $loan->location->branch_name }}</td>
-          <td>{{ $loan->total_loan_amount }}</td>
-          <!-- <td>{{ $loan->loanType->loan_types }}</td> -->
+        @php
+            $totalLoanAmount = 0;
+            $totalJewelGrams = 0;
+            $totalJewelNetGrams = 0;
+        @endphp
 
-          <td>{{ $loan->interest_month." - Month" }}</td>
-          <td>{{   number_format((float)$loan->total_interest_amount / $loan->interest_month, 2, '.', '');  }}</td>
-          <td>{{ $loan->created_at }}</td>
-          @php
-    switch ($loan->status) {
-        case 'New':
-            $statusClass = 'status-new';
-            break;
-        case 'Approved':
-            $statusClass = 'status-approved';
-            break;
-        case 'Rejected':
-            $statusClass = 'status-rejected';
-            break;
-        case 'Dispatch':
-            $statusClass = 'status-dispatch';
-            break;
-        case 'Withdraw':
-            $statusClass = 'status-withdraw';
-            break;
-        default:
-            $statusClass = '';
-            break;
-    }
-@endphp
+        @foreach ($loans as $loan)
+            @php
+                // Accumulate totals
+                $totalLoanAmount += $loan->total_loan_amount;
+                $totalJewelGrams += $loan->jewel_grams;
+                $totalJewelNetGrams += $loan->jewel_net_grams;
 
-<td class="{{ $statusClass }}">
-    {{ $loan->status }}
-</td>
+                // Determine status class
+                switch ($loan->status) {
+                    case 'New': $statusClass = 'status-new'; break;
+                    case 'Approved': $statusClass = 'status-approved'; break;
+                    case 'Rejected': $statusClass = 'status-rejected'; break;
+                    case 'Dispatch': $statusClass = 'status-dispatch'; break;
+                    case 'Withdraw': $statusClass = 'status-withdraw'; break;
+                    default: $statusClass = ''; break;
+                }
+            @endphp
 
-
-
-
-        </tr>
-
+            <tr>
+                <td>{{ $loan->loan_number }}</td>
+                <td>{{ $loan->customer->customer_id }}</td>
+                <td>{{ $loan->customer->first_name }} {{ $loan->customer->last_name }}</td>
+                <td>{{ $loan->location->branch_name }}</td>
+                <td>{{ number_format($loan->total_loan_amount, 2) }}</td>
+                <td>{{ number_format($loan->jewel_grams, 2) }} grms</td>
+                <td>{{ number_format($loan->jewel_net_grams, 2) }} grms</td>
+                <td>{{ $loan->interest_month }} - Month</td>
+                <td>{{ $loan->created_at->format('d-m-Y') }}</td>
+                <td class="{{ $statusClass }}">{{ $loan->status }}</td>
+            </tr>
         @endforeach
 
-        </tbody>
+        <!-- Last row for totals -->
+  <tr class="table-success font-weight-bold">
+    <td  class="text-right">Total:</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>{{ number_format($totalLoanAmount, 2) }}</td>
+    <td>{{ number_format($totalJewelGrams, 2) }} grms</td>
+    <td>{{ number_format($totalJewelNetGrams, 2) }} grms</td>
+    <td></td> <!-- Empty columns for alignment -->
+    <td></td>
+    <td></td>
+</tr>
+    </tbody>
 
     </table>
   </div>

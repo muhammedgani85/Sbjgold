@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\EmployeeSalary;
 use App\Mail\FollowUpNotificationMail;
 use Illuminate\Support\Facades\Mail;
+use DB;
 
 class AttendanceController extends Controller
 {
@@ -22,7 +23,28 @@ class AttendanceController extends Controller
     public function index()
     {
        $location = session('user_data')->location;
-        $employees = User::where('location',$location)->get();
+
+       $role = session('user_data')->role;
+       $is_check = $this->check_role($role);
+
+
+
+
+      if($is_check){
+        $employees = User::orderBy('id', 'DESC')->get();
+
+      } else {
+        $employees = User::orderBy('id', 'DESC')->where('location', $location)->get();
+
+
+      }
+
+
+
+       // $employees = User::where('location',$location)->get();
+
+
+
         $publicHolidays = PublicHoliday::whereYear('date', Carbon::now()->year)->get();
         $monthDays = Carbon::now()->daysInMonth;
 
@@ -222,6 +244,23 @@ public function sendFollowUpEmail()
     return response()->json(['message' => 'Email sent successfully']);
 }
 
+
+public static function check_role($role_id)
+{
+    // Ensure $role_id is an array
+    if (!is_array($role_id)) {
+        $role_id = explode(',', $role_id); // Convert comma-separated string to array
+    }
+
+    // Cast all values to strings (to match database if `master_id` is stored as strings)
+    $role_id = array_map('strval', $role_id);
+
+    $roleExists = DB::table('master_access')
+        ->where('master_id', $role_id) // Ensure data type alignment
+        ->exists();
+
+    return $roleExists; // Return true if exists, false otherwise
+}
 
 
 }

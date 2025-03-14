@@ -3,6 +3,11 @@
 @section('title', 'Edit Customer')
 
 @section('content')
+<style>
+  .fieldmandatory{
+    color:red !important;
+  }
+</style>
 <h4 class="py-3 mb-4"><span class="text-muted fw-light">Customer Details </span> </h4>
 <form id="customerForm" enctype="multipart/form-data">
     @csrf
@@ -23,7 +28,7 @@
                         <input type="text" name="initial" id="initial" class="form-control" maxlength="2" minlength="1" value="{{ $customer->initial }}">
                     </div>
                     <div class="input-group">
-                        <span class="input-group-text">First Name</span>
+                        <span class="input-group-text fieldmandatory">First Name</span>
                         <input type="text" name="first_name" id="first_name" class="form-control" value="{{ $customer->first_name }}">
                     </div>
                     <div class="input-group">
@@ -41,7 +46,7 @@
                     <div class="input-group">
                         <label class="input-group-text" for="inputGroupSelect01">Gender</label>
                         <select class="form-select" id="gender" name="gender">
-                            <option selected>Choose...</option>
+                            <option selected value="0">Choose...</option>
                             <option value="Male" {{ $customer->gender == 'Male' ? 'selected' : '' }}>Male</option>
                             <option value="FeMale" {{ $customer->gender == 'FeMale' ? 'selected' : '' }}>FeMale</option>
                             <option value="Others" {{ $customer->gender == 'Others' ? 'selected' : '' }}>Others</option>
@@ -54,7 +59,7 @@
                     <div class="input-group">
                         <label class="input-group-text" for="inputGroupSelect01">Marital Status</label>
                         <select class="form-select" id="marital_status" name="marital_status">
-                            <option selected>Choose...</option>
+                            <option selected value="0">Choose...</option>
                             <option value="UnMarried" {{ $customer->marital_status == 'UnMarried' ? 'selected' : '' }}>UnMarried</option>
                             <option value="Married" {{ $customer->marital_status == 'Married' ? 'selected' : '' }}>Married</option>
                             <option value="Single" {{ $customer->marital_status == 'Single' ? 'selected' : '' }}>Single</option>
@@ -71,11 +76,11 @@
                 <h5 class="card-header">Contact Details</h5>
                 <div class="card-body demo-vertical-spacing demo-only-element">
                     <div class="input-group">
-                        <span class="input-group-text">Phone Number</span>
+                        <span class="input-group-text fieldmandatory">Phone Number</span>
                         <input type="text" name="phone_number" id="phone_number" class="form-control" onkeypress="return isNumber(event)" maxlength="13" minlength="10" value="{{ $customer->phone_number }}">
                     </div>
                     <div class="input-group">
-                        <span class="input-group-text">Emr. Number</span>
+                        <span class="input-group-text fieldmandatory">Emr. Number</span>
                         <input type="text" name="emergency_number" id="emergency_number" class="form-control" onkeypress="return isNumber(event)" maxlength="13" minlength="10" value="{{ $customer->emergency_number }}">
                     </div>
                     <div class="input-group">
@@ -83,11 +88,11 @@
                         <input type="text" name="email_id" id="email_id" class="form-control" value="{{ $customer->email_id }}">
                     </div>
                     <div class="input-group">
-                        <span class="input-group-text">City</span>
+                        <span class="input-group-text fieldmandatory">City</span>
                         <input type="text" name="city" id="city" class="form-control" value="{{ $customer->city }}">
                     </div>
                     <div class="input-group input-group-merge">
-                        <span class="input-group-text">Permanent Address</span>
+                        <span class="input-group-text fieldmandatory">Permanent Address</span>
                         <textarea class="form-control" name="permanent_address" id="permanent_address">{{ $customer->permanent_address }}</textarea>
                     </div>
                     <div class="input-group input-group-merge">
@@ -109,7 +114,7 @@
                 <div class="card-body demo-vertical-spacing demo-only-element">
                     <div class="input-group">
                         <span class="input-group-text">Aadhar Number</span>
-                        <input type="text" name="aadhar_number" id="aadhar_number" class="form-control" onkeypress="return isNumber(event)" maxlength="16" minlength="16" value="{{ $customer->aadhar_number }}">
+                        <input type="text" name="aadhar_number" id="aadhar_number" class="form-control" onkeypress="return isNumber(event)" maxlength="12" minlength="12" value="{{ $customer->aadhar_number }}">
                     </div>
                     <div class="input-group">
                         <span class="input-group-text">Driving Lic Number</span>
@@ -132,7 +137,7 @@
                     <div class="input-group">
                         <label class="input-group-text" for="inputGroupSelect01">Occupation</label>
                         <select class="form-select" id="occupation_id" name="occupation_id">
-                            <option selected>Choose...</option>
+                            <option selected value="94">Choose...</option>
                             @foreach($occupations as $occupation)
                             <option value="{{  $occupation->id }}" {{ $customer->occupation_id  == $occupation->id  ? 'selected' : '' }}>{{ $occupation->occupation }}</option>
 
@@ -143,7 +148,7 @@
                     <div class="input-group">
                         <label class="input-group-text" for="inputGroupSelect01">Type</label>
                         <select class="form-select" id="occupation_type" name="occupation_type">
-                            <option selected>Choose...</option>
+                            <option selected value="0">Choose...</option>
                             <option value="Salaried" {{ $customer->occupation_type == 'Salaried' ? 'selected' : '' }}>Salaried</option>
                             <option value="Business" {{ $customer->occupation_type == 'Business' ? 'selected' : '' }}>Business</option>
 
@@ -293,10 +298,14 @@
             processData: false,
             success: function(response) {
                 //alert(response.success);
-
+                if(response.success=="success"){
                 swal("Done!", response.success, "success");
-                window.location.href = "{{ url('customers')}}";
 
+                } else{
+                  swal("Done!", response.success, "error");
+
+                }
+                window.location.href = "{{ url('customers')}}";
                 //location.reload();
             },
             error: function(response) {

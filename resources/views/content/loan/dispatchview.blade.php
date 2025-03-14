@@ -148,31 +148,9 @@
     <!-- Speech To Text -->
     <div class="col-md-12">
       <div class="card mb-12">
-        <h5 class="card-header">Documents</h5>
+        <h5 class="card-header">Payment Type</h5>
         <div class="card-body demo-vertical-spacing demo-only-element">
 
-        <div class="input-group">
-        @if($loan->customer_other!=NULL)
-                    <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
-                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
-
-                  </a>
-                    @else
-                    No Image
-                    @endif
-          </div>
-
-
-
-
-          <div class="input-group">
-            <label class="input-group-text" for="document">Others</label>
-            <img src="" />
-          </div>
-
-
-
-          <label>Payment Type : </label>
           <div class="input-group">
 
           <input type="radio" id="cash" name="status" value="cash"> &nbsp;<span style="color:green;">Cash</span> &nbsp;&nbsp;&nbsp;
@@ -320,6 +298,7 @@
     $('#submitStatus').click(function() {
         // Get selected radio button value
         var status = $('input[name="status"]:checked').val();
+        var loan_number = $('#loan_number').val();
 
         if (!status) {
             Swal.fire({
@@ -359,7 +338,7 @@
                         );
 
 
-                        window.location.href ='www.google.com';
+                        window.open(`/new_release-letter/${loan_number}`, '_blank');
                     },
                     error: function(xhr, status, error) {
                         Swal.fire(

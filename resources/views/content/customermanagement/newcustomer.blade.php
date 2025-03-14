@@ -3,6 +3,11 @@
 @section('title', 'New Employee')
 
 @section('content')
+<style>
+  .fieldmandatory{
+    color:red !important;
+  }
+</style>
 <h4 class="py-3 mb-4"><span class="text-muted fw-light">Customer Details </span> </h4>
 <form id="customerForm" enctype="multipart/form-data">
   @csrf
@@ -14,7 +19,7 @@
         <div class="card-body demo-vertical-spacing demo-only-element">
 
           <div class="input-group">
-            <span class="input-group-text">Customer ID</span>
+            <span class="input-group-text fieldmandatory">Customer ID</span>
             <input type="text" aria-label="First name" name="customer_id" id="customer_id" class="form-control" value="{{ $customerId }}" readonly>
             <input type="hidden" aria-label="First name" name="location_id" id="location_id" class="form-control" value="{{ $location }}" readonly>
 
@@ -26,7 +31,7 @@
 
           </div>
           <div class="input-group">
-            <span class="input-group-text">First Name</span>
+            <span class="input-group-text fieldmandatory">First Name</span>
             <input type="text" aria-label="First name" name="first_name" id="first_name" class="form-control">
 
           </div>
@@ -52,7 +57,7 @@
           <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Gender</label>
             <select class="form-select" id="gender" name="gender">
-              <option selected>Choose...</option>
+              <option selected value="0">Choose...</option>
               <option value="Male">Male</option>
               <option value="FeMale">FeMale</option>
               <option value="Others">Others</option>
@@ -69,7 +74,7 @@
           <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Marital Status</label>
             <select class="form-select" id="marital_status" name="marital_status">
-              <option selected>Choose...</option>
+              <option selected value="0">Choose...</option>
               <option value="UnMarried">UnMarried</option>
               <option value="Married">Married</option>
               <option value="Single">Single</option>
@@ -91,13 +96,13 @@
 
 
           <div class="input-group">
-            <span class="input-group-text">Phone Number</span>
+            <span class="input-group-text fieldmandatory">Phone Number</span>
             <input type="text" aria-label="First name" name="phone_number" id="phone_number" class="form-control" onkeypress="return isNumber(event)" maxlength="13" minlength="10">
 
           </div>
 
           <div class="input-group">
-            <span class="input-group-text">Emr. Number</span>
+            <span class="input-group-text fieldmandatory">Emr. Number</span>
             <input type="text" aria-label="First name" name="emergency_number" id="emergency_number" class="form-control" onkeypress="return isNumber(event)" maxlength="13" minlength="10">
 
           </div>
@@ -108,14 +113,14 @@
 
           </div>
           <div class="input-group">
-            <span class="input-group-text">City</span>
+            <span class="input-group-text fieldmandatory">City</span>
             <input type="text" aria-label="First name" name="city" id="city" class="form-control">
 
           </div>
 
 
           <div class="input-group input-group-merge">
-            <span class="input-group-text">Permant ddress</span>
+            <span class="input-group-text fieldmandatory">Permant ddress</span>
             <textarea class="form-control" aria-label="With textarea" name="permanent_address" id="permanent_address"></textarea>
           </div>
 
@@ -138,8 +143,8 @@
         <div class="card-body demo-vertical-spacing demo-only-element">
 
           <div class="input-group">
-            <span class="input-group-text">Aadhar Number</span>
-            <input type="text" aria-label="First name" name="aadhar_number" id="aadhar_number" class="form-control" onkeypress="return isNumber(event)" onkeypress="return isNumber(event)" maxlength="16" minlength="16">
+            <span class="input-group-text fieldmandatory">Aadhar Number</span>
+            <input type="text" aria-label="First name" name="aadhar_number" id="aadhar_number" class="form-control" onkeypress="return isNumber(event)" onkeypress="return isNumber(event)" maxlength="12" minlength="12">
 
           </div>
 
@@ -166,7 +171,7 @@
           <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Occupation</label>
             <select class="form-select" id="occupation_id" name="occupation_id">
-              <option selected>Choose...</option>
+              <option selected value="94">Choose...</option>
               @foreach($occupations as $occupation)
               <option value="{{  $occupation->id }}">{{ $occupation->occupation }}</option>
 
@@ -177,7 +182,7 @@
           <div class="input-group">
             <label class="input-group-text" for="inputGroupSelect01">Type</label>
             <select class="form-select" id="occupation_type" name="occupation_type">
-              <option selected>Choose...</option>
+              <option selected value="0">Choose...</option>
               <option value="Salaried">Salaried</option>
               <option value="Business">Business</option>
 

@@ -147,7 +147,10 @@
           <tr>
             <td class="text-left">{{ $loop->iteration }}</td>
 
-            <td><img src="{{ asset('storage/' . $user->customer_photo) }}" alt="Image" style="width:100px; height:100px;"></td>
+            <td>
+            <a href="{{ asset('storage/' . $user->customer_photo) }}" target="_blank">
+            <img src="{{ $user->customer_photo ? asset('storage/' . $user->customer_photo) : asset('assets/images/sj_logo.png') }}"  alt="Image" style="width:50px; height:50px; border-radius:50%;">
+          </a>
             <td class="text-left">{{ $user->customer_id  }}</td>
             <td class="text-left">{{ $user->initial }} {{ $user->first_name }} {{ $user->last_name }} </td>
 

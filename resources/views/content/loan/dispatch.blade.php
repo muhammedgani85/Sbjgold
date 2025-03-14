@@ -43,8 +43,8 @@
                 <tr>
                 <td>
                     @if($loan->customer_photo!=NULL)
-                    <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
-                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+                    <a href="{{ asset('storage/' . $loan->customer_photo) }}" target="_blank">
+                    <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
                     </a>
                     @else
                     No Image

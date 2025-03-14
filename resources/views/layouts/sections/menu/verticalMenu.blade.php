@@ -1,5 +1,35 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+<style>
+  /* Submenu hidden by default */
+.submenu {
+    display: none;
+    padding-left: 20px;
+    list-style: none;
+    background-color: #f9f9f9;
+}
 
+.submenu-item {
+    padding: 5px 0;
+}
+
+.submenu-link {
+    text-decoration: none;
+    color: #333;
+    padding: 5px;
+    display: block;
+}
+
+/* Show submenu when 'show' class is added */
+.submenu.show {
+    display: block;
+}
+
+/* Active state for menu items */
+.menu-item.active > .menu-link {
+    background-color: #ddd;
+}
+
+</style>
   <!-- ! Hide app brand if navbar-full -->
   <div class="app-brand demo">
     <a href="{{url('/')}}" class="app-brand-link">
@@ -17,63 +47,118 @@
 
   <div class="menu-inner-shadow"></div>
 
-  <ul class="menu-inner py-1" >
-    @foreach ($menuData[0]->menu as $menu)
+  <ul class="menu-inner py-1">
+    <?php
+    $userData = session('user_data');
 
-    {{-- adding active and open class if child is active --}}
+    if ($userData) {
+        // Get the role id from session data
+        $roleId = $userData['role'];
 
-    {{-- menu headers --}}
-    @if (isset($menu->menuHeader))
-    <li class="menu-header small text-uppercase">
-      <span class="menu-header-text">{{ __($menu->menuHeader) }}</span>
-    </li>
+        // Get the permissions for the role
+        $menuPermissions = \App\Models\Menu_permissions::where('role_id', $roleId)->get();
 
-    @else
+        // Retrieve menus and submenus based on permissions
+        $menus = \App\Models\Menu::whereIn('id', $menuPermissions->pluck('menu_id'))
+            ->with(['subMenus' => function ($query) use ($menuPermissions) {
+                $query->whereIn('id', $menuPermissions->pluck('submenu_id'));
+            }])
+            ->where('status', 'Active')
+            ->orderby('menu_order','ASC')
+            ->get();
 
-    {{-- active menu method --}}
-    @php
-    $activeClass = null;
-    $currentRouteName = Route::currentRouteName();
+        // Format the data
+        $formattedData = [
+            'menu' => $menus->map(function ($menu) {
+                $submenu = $menu->subMenus->map(function ($sub) {
+                    return [
+                        'url' => $sub->url,
+                        'name' => $sub->name,
+                        'slug' => $sub->slug,
+                    ];
+                });
 
-    if ($currentRouteName === $menu->slug) {
-    $activeClass = 'active';
+                return [
+                    'url' => $menu->url,
+                    'name' => $menu->name,
+                    'icon' => $menu->icon,
+                    'slug' => $menu->slug,
+                    'submenu' => $submenu->isEmpty() ? null : $submenu,
+                ];
+            }),
+        ];
+
+        $menuData = $formattedData['menu'];
+    } else {
+        $menuData = []; // Handle the case where user_data is not in the session
     }
-    elseif (isset($menu->submenu)) {
-    if (gettype($menu->slug) === 'array') {
-    foreach($menu->slug as $slug){
-    if (str_contains($currentRouteName,$slug) and strpos($currentRouteName,$slug) === 0) {
-    $activeClass = 'active open';
-    }
-    }
-    }
-    else{
-    if (str_contains($currentRouteName,$menu->slug) and strpos($currentRouteName,$menu->slug) === 0) {
-    $activeClass = 'active open';
-    }
-    }
+    ?>
 
-    }
-    @endphp
+    @foreach ($menuData as $menu)
+        {{-- Menu headers --}}
+        @if (isset($menu['menuHeader']))
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">{{ __($menu['menuHeader']) }}</span>
+            </li>
+        @else
+            @php
+                $activeClass = null;
+                $currentRouteName = Route::currentRouteName();
 
-    {{-- main menu --}}
-    <li class="menu-item {{$activeClass}}">
-      <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}" class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}" @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
-        @isset($menu->icon)
-        <i class="{{ $menu->icon }}"></i>
-        @endisset
-        <div>{{ isset($menu->name) ? __($menu->name) : '' }}</div>
-        @isset($menu->badge)
-        <div class="badge bg-{{ $menu->badge[0] }} rounded-pill ms-auto">{{ $menu->badge[1] }}</div>
-        @endisset
-      </a>
+                if ($currentRouteName === $menu['slug']) {
+                    $activeClass = 'active';
+                } elseif (!empty($menu['submenu'])) {
+                    foreach ($menu['submenu'] as $subMenu) {
+                        if ($currentRouteName === $subMenu['slug']) {
+                            $activeClass = 'active open';
+                            break;
+                        }
+                    }
+                }
+            @endphp
 
-      {{-- submenu --}}
-      @isset($menu->submenu)
-      @include('layouts.sections.menu.submenu',['menu' => $menu->submenu])
-      @endisset
-    </li>
-    @endif
+            {{-- Main menu --}}
+            <li class="menu-item {{ $activeClass }}">
+                <a href="{{ isset($menu['url']) ? url($menu['url']) : 'javascript:void(0);' }}" class="menu-link {{ !empty($menu['submenu']) ? 'menu-toggle' : '' }}">
+                    @isset($menu['icon'])
+                        <i class="{{ $menu['icon'] }}"></i>
+                    @endisset
+                    <div>{{ __($menu['name']) }}</div>
+                </a>
+
+                {{-- Submenu --}}
+                @if (!empty($menu['submenu']))
+                    <ul class="submenu">
+                        @foreach ($menu['submenu'] as $subMenu)
+                            <li class="submenu-item">
+                                <a href="{{ url($subMenu['url']) }}" class="submenu-link">{{ __($subMenu['name']) }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </li>
+        @endif
     @endforeach
-  </ul>
+</ul>
 
 </aside>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Find all menu items that can have submenus
+    const menuItems = document.querySelectorAll('.menu-toggle');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function (e) {
+            // Prevent default behavior (if it's a link)
+            e.preventDefault();
+
+            // Toggle the 'open' class to show or hide the submenu
+            const submenu = this.nextElementSibling;
+            if (submenu && submenu.classList.contains('submenu')) {
+                submenu.classList.toggle('show');
+            }
+        });
+    });
+});
+
+</script>

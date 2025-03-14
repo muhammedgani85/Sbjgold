@@ -148,10 +148,10 @@
           <tr>
             <td class="text-left">{{ $loop->iteration }}</td>
             <td class="text-left">
-            <img
-            src="{{ $user->document ? asset('storage/' . $user->document) : asset('storage/default-image.jpg') }}"
-            alt="Image"
-            style="width:100px; height:100px;">
+            <a href="{{ asset('storage/' . $user->document) }}" target="_blank">
+          <img src="{{ $user->document ? asset('storage/' . $user->document) : asset('assets/images/default.jpg') }}"  alt="Image" style="width:50px; height:50px; border-radius:50%;">
+          </a>
+
 </td>
             <td class="text-left">{{ $user->emp_id }}</td>
             <td class="text-left">{{ $user->initial }} {{ $user->first_name }} {{ $user->last_name }} </td>
@@ -254,7 +254,7 @@
   });
 </script>
 
-/* Add link in head section */
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
 

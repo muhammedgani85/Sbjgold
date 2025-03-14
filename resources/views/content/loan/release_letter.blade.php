@@ -102,7 +102,7 @@
     <div align="right" style="padding-right:100px;">
         <img src="{{ asset('storage/' . $customer->customer_photo) }}" alt="Image" style="width:50px; height:50px;">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:50px; height:50px;">
+        <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:50px; height:50px;">
     </div>
 
     <!-- Customer and Loan Details -->

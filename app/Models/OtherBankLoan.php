@@ -17,4 +17,14 @@ class OtherBankLoan extends Model
     {
     return $this->belongsTo(Banks::class, 'bank_id', 'id');
     }
+
+    public function loans()
+{
+    return $this->hasOne(Loan::class, 'loan_number', 'customer_loan_no');
+}
+
+
+
+
+
 }

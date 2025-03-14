@@ -21,7 +21,18 @@ class UserController extends Controller
      */
     public function index()
     {
+
+      $location = session('user_data')->location;
+      $role = session('user_data')->role;
+      $is_check = AttendanceController::check_role($role);
+
+      if($is_check){
         $users = User::orderBy('id', 'DESC')->get();
+      }else{
+        $users = User::where('location',$location)->orderBy('id', 'DESC')->get();
+      }
+
+
         return view('content.usersmanagement.index', compact('users'));
     }
 

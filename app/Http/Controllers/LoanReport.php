@@ -30,7 +30,7 @@ class LoanReport extends Controller
         $loan_status = Loan::distinct()->pluck('status');
 
         // Start building the query
-        $query = Loan::with(['loanType', 'location', 'customer'])->orderBy('id', 'DESC');
+        $query = Loan::with(['loanType', 'location', 'customer'])->where('status','Dispatch')->orderBy('id', 'DESC');
 
         // Apply filters based on request inputs
         if ($request->has('location') && $request->location != '') {
@@ -129,28 +129,30 @@ class LoanReport extends Controller
       $from_date = request('from_date');
       $to_date = request('to_date');
       $branch_id = request('location');
-      $status = request('status');
+      $status = isset($request->status)?$request->status:"Active";
 
       // Query with filters
-      $other_loans = OtherBankLoan::with(['customer', 'bank'])
-          ->when($from_date, function ($query) use ($from_date) {
-              $query->whereDate('created_at', '>=', $from_date);
-          })
-          ->when($to_date, function ($query) use ($to_date) {
-              $query->whereDate('created_at', '<=', $to_date);
-          })
-          ->when($branch_id, function ($query) use ($branch_id) {
-              $query->where('bank_id', $branch_id);
-          })
-        /*  ->when($status, function ($query) use ($status) {
-              $query->where('status', $status);
-          }) */
-          ->orderBy('id', 'DESC')
-          ->get();
+      $other_loans = OtherBankLoan::with(['customer', 'bank', 'loans']) // Added 'loans' relationship
+      ->when($from_date, function ($query) use ($from_date) {
+      $query->whereDate('created_at', '>=', $from_date);
+      })
+      ->when($to_date, function ($query) use ($to_date) {
+      $query->whereDate('created_at', '<=', $to_date);
+      })
+      ->when($branch_id, function ($query) use ($branch_id) {
+      $query->where('bank_id', $branch_id);
+      })
+      ->when($status, function ($query) use ($status) {
+      $query->where('status', $status);
+      })
+      ->orderBy('id', 'DESC')
+      ->get();
 
       $branch = Branch::where('status', 'Active')->get();
       $banks = Banks::where('status', 'Active')->get();
       $loan_status = OtherBankLoan::distinct()->pluck('status');
+
+     // dd($other_loans);
 
       return view('content.other_bank_loan.sh_loan_report', compact('other_loans', 'branch', 'role','banks','loan_status'));
 

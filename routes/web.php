@@ -55,6 +55,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\InterestPayment;
 use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\AttendanceReportController;
+use App\Http\Controllers\BanksController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ExpensesReportController;
 use App\Http\Controllers\LeaveReportController;
@@ -62,12 +63,15 @@ use App\Http\Controllers\CustomerReportController;
 use App\Http\Controllers\TeleCallerController;
 use App\Http\Controllers\TelecallerFollowController;
 use App\Http\Controllers\FundController;
+use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\LoanReport;
 use App\Http\Controllers\OtherBankLoanController;
 use App\Http\Controllers\TodayBusinessReport;
 use App\Models\OtherBankLoan;
 use App\Http\Controllers\LoanActionController;
-
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\MenuPermissionController;
+use App\Models\LoanInterestPayment;
 
 // Main Page Route
 Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
@@ -200,9 +204,12 @@ Route::get('/send_follow_up_email', [AttendanceController::class, 'sendFollowUpE
 
 
 // Loan Interest Setting
+Route::resource('loan_interests', LoanInterestController::class);
 Route::get('/loan_interests', [LoanInterestController::class, 'index'])->name('loan_interests.index');
 Route::get('/loan_interests/create', [LoanInterestController::class, 'create'])->name('loan_interests.create');
-Route::post('/loan_interests', [LoanInterestController::class, 'store'])->name('loan_interests.store');
+Route::post('/loan_interests/store', [LoanInterestController::class, 'store'])->name('loan_interests.store');
+
+Route::get('/loan_interests/{id}/edit', [LoanInterestController::class, 'edit'])->name('loan_interests.edit');
 
 
 // Loan Management
@@ -229,7 +236,7 @@ Route::get('/loans/dispatchview/{loan_number}', [LoanController::class, 'dispatc
 Route::post('/release-loan', [LoanController::class, 'releaseLoan'])->name('release-loan');
 Route::get('/release-letter/{id}', [LoanController::class, 'releaseLetter'])->name('release-letter');
 Route::post('/revoke-loan', [LoanController::class, 'revokeLoan'])->name('revoke.loan');
-
+Route::get('/new_release-letter/{id}', [LoanController::class, 'newLoanrelease'])->name('new_release-letter');
 
 
 
@@ -249,8 +256,12 @@ Route::post('/update-loan-status', [LoanController::class, 'updateLoanStatus'])-
 Route::post('/update-dispatch-loan-status', [LoanController::class, 'updateLoanDispatchStatus'])->name('updateLoanDispatchStatus');
 Route::any('/interest-payment', [LoanInterestController::class, 'store'])->name('interest.payment.store');
 
+// Interest Paid
 
-Route::any('/interstlist/{locationId}', [InterestPayment::class, 'index'])->name('loans.customer_interest_list');
+Route::any('/interest-paid', [LoanInterestController::class, 'paidInterest'])->name('interest.payment.paid');
+
+
+Route::any('/interstlist/{loan_number}', [InterestPayment::class, 'index'])->name('loans.customer_interest_list1');
 
 Route::any('/interst_invoice/{loan_id}', [InterestPayment::class, 'interest_invoice'])->name('loans.interest_invoice');
 
@@ -280,6 +291,11 @@ Route::get('/other_loans/get-loan-numbers/{customer_id}', [OtherBankLoanControll
 Route::post('/other-bank-save-loan', [OtherBankLoanController::class, 'store'])->name('other_loans.store');
 Route::any('/other-bank-interest', [OtherBankLoanController::class, 'interestReminder'])->name('other_loans.interestReminder');
 
+Route::post('/other_release-loan', [OtherBankLoanController::class, 'otherReleaseLoan'])->name('other_release-loan');
+Route::post('/other_revoke-loan', [OtherBankLoanController::class, 'otherrevokeLoan'])->name('other_revoke-loan');
+
+
+Route::any('/sh_interest-paid', [LoanInterestController::class, 'otherPaidInterest'])->name('sh_interest.shpayment.shpaid');
 
 //Today Business Report
 Route::resource('today_business', TodayBusinessReport::class);
@@ -320,6 +336,49 @@ Route::any('/branch', [BranchController::class, 'index'])->name('branch.index');
 Route::delete('/branch/softDelete/{id}', [BranchController::class, 'softDelete'])->name('branch.softDelete');
 Route::any('branch/create', [BranchController::class, 'create'])->name('branch.create');
 Route::any('branch/store', [BranchController::class, 'store'])->name('branch.store');
-//Route::any('/branch/update', [BranchController::class, 'update'])->name('branch.update');
+Route::any('/branch/update', [BranchController::class, 'update'])->name('branch.update');
 
 Route::post('/branch/{branch}', [BranchController::class, 'update'])->name('branch.update');
+
+
+//Setting Feature
+Route::get('/list_expenses', [ExpenseController::class, 'list_expenses'])->name('list_expenses');
+Route::get('/new_expences', [ExpenseController::class, 'new_expences'])->name('new_expences');
+Route::any('new_expences_save', [ExpenseController::class, 'new_expences_save'])->name('new_expences_save');
+Route::put('new_expences/{id}', [ExpenseController::class, 'new_ex_update'])->name('new_expences.update');
+
+// Roles
+Route::resource('roles', RolesController::class);
+Route::get('roles', [RolesController::class, 'index'])->name('roles.index');
+Route::get('roles/create', [RolesController::class, 'create'])->name('roles.create');
+Route::any('roles/store', [RolesController::class, 'store'])->name('roles.store');
+Route::delete('/roles/softDelete/{id}', [RolesController::class, 'softDelete'])->name('roles.softDelete');
+Route::get('/roles/{roles}/edit', [RolesController::class, 'edit'])->name('roles.edit');
+
+// Menu Permission
+
+Route::resource('mpermission', MenuPermissionController::class);
+Route::any('/mpermission', [MenuPermissionController::class, 'index'])->name('mpermission.index');
+
+Route::any('mpermission/store', [MenuPermissionController::class, 'store'])->name('mpermission.store');
+
+
+// Banks
+Route::resource('banks', BanksController::class);
+Route::get('banks', [BanksController::class, 'index'])->name('banks.index');
+Route::get('/banks/{banks}/edit', [BanksController::class, 'edit'])->name('banks.edit');
+Route::post('/banks/{banks}', [BanksController::class, 'update'])->name('banks.update');
+Route::get('banks/create', [BanksController::class, 'create'])->name('banks.create');
+Route::any('banks_store', [BanksController::class, 'store'])->name('banks.store');
+/*Route::delete('/roles/softDelete/{id}', [RolesController::class, 'softDelete'])->name('roles.softDelete');
+Route::get('/roles/{roles}/edit', [RolesController::class, 'edit'])->name('roles.edit'); */
+
+
+// Ledger
+Route::resource('ledger', LedgerController::class);
+Route::get('/ledger', [LedgerController::class, 'index'])->name('ledger.index');
+
+
+// Loan Interest Report
+
+Route::get('/interestReport', [LoanInterestController::class, 'interestReport'])->name('report.intrestreport');

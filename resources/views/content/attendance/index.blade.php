@@ -147,14 +147,14 @@
                 $isHoliday = $publicHolidays->firstWhere('date', $date->toDateString());
                 $isSunday = $date->isSunday();
 
-                if ($attendanceForDay || $isHoliday || $isSunday) {
+                if ($attendanceForDay || $isHoliday) {
                 $presentDays++;
                 }
 
                 @endphp
 
                 <td class="{{ trim($isHoliday ? 'holiday' : '') }} {{ trim($isSunday ? 'sunday' : '') }}">
-                  <input type="checkbox" name="attendance[{{ $employee->id }}][{{ $date->toDateString() }}]" {{ $attendanceForDay || $isHoliday || $isSunday ? 'checked' : '' }} {{ $isHoliday || $isSunday ? 'disabled' : '' }}>
+                  <input type="checkbox" name="attendance[{{ $employee->id }}][{{ $date->toDateString() }}]" {{ $attendanceForDay || $isHoliday ? 'checked' : '' }} {{ $isHoliday  ? 'disabled' : '' }}>
                 </td>
                 @endfor
                 <td>{{ $presentDays }}</td>

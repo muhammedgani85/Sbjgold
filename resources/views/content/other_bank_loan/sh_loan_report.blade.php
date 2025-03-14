@@ -76,7 +76,9 @@
             <label for="status" class="font-weight-bold">Status:</label>
 
             <select name="status" id="status" class="form-control">
-                <option value="">All</option>
+                <!-- <option value="">All</option> -->
+                <option value="Active">Active</option>
+                <option value="Released">Released</option>
 
 
 
@@ -101,6 +103,8 @@
             <th>S.H.Name</th>
             <th>S.H.Loan Number</th>
             <th>Loan Amount</th>
+            <th>Jewl Grm</th>
+            <th>Net Grm</th>
             <th>Month</th>
             <th>Int Rate</th>
             <th>L.Date</th>
@@ -110,7 +114,18 @@
         </tr>
     </thead>
     <tbody>
+        @php
+            $totalLoanAmount = 0;
+            $totalJewelGrams = 0;
+            $totalJewelNetGrams = 0;
+        @endphp
         @foreach($other_loans as $loan)
+                @php
+                $totalLoanAmount += $loan->loan_amount;
+                $totalJewelGrams += $loan->loans->jewel_grams;
+                $totalJewelNetGrams += $loan->loans->jewel_net_grams;
+                @endphp
+
             <tr>
                 <td>{{ $loan->customer_loan_no }}</td>
                 <td>{{ $loan->customer ? $loan->customer->customer_id : 'N/A' }}</td> <!-- Displaying customer ID -->
@@ -118,6 +133,8 @@
                 <td>{{ $loan->bank->bank_name ? $loan->bank->bank_name : 'N/A'  }}</td>
                 <td>{{ $loan->bank_loan_number ? $loan->bank_loan_number : 'N/A'  }}</td>
                 <td>{{ $loan->loan_amount }}</td>
+                <td>{{ $loan->loans ? $loan->loans->jewel_net_grams : 'N/A' }}</td>
+                <td>{{ $loan->loans ? $loan->loans->jewel_grams : 'N/A' }}</td>
                 <td>{{ $loan->tenurity }}</td>
                 <td>{{ $loan->interest_rate }}</td>
                 <td>{{ date('d-m-Y',strtotime($loan->loan_date)) }}</td> <!-- Assuming loan_date is a Carbon instance -->
@@ -127,6 +144,22 @@
 
             </tr>
         @endforeach
+
+    <tr class="table-success font-weight-bold">
+    <td  class="text-right">Total:</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+
+    <td>{{ number_format($totalLoanAmount, 2) }}</td>
+    <td>{{ number_format($totalJewelGrams, 2) }} grms</td>
+    <td>{{ number_format($totalJewelNetGrams, 2) }} grms</td>
+    <td></td> <!-- Empty columns for alignment -->
+    <td></td>
+    <td></td>
+
+</tr>
     </tbody>
 
     </table>

@@ -5,6 +5,9 @@
 @section('page-script')
 <script src="{{asset('assets/js/form-basic-inputs.js')}}"></script>
 @endsection
+@php
+use Carbon\Carbon;
+@endphp
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Include other styles here -->
@@ -22,8 +25,8 @@
             <div class="content-left">
               <span>Loans (Total)</span>
               <div class="d-flex align-items-end mt-2">
-                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $total =  $loans->count();  }}</h4>
-                <!-- <small class="text-success">(+29%)</small> -->
+                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $total =  $loans->count();  }}</h4> / &nbsp;
+                <small class="text-danger font-weight-bold">{{ isset($loans)?$loans->where('status','Dispatch')->sum('total_loan_amount'):"0" }}</small>
               </div>
               <!-- <p class="mb-0">Total Employees</p> -->
             </div>
@@ -43,8 +46,8 @@
             <div class="content-left">
               <span>Today</span>
               <div class="d-flex align-items-end mt-2">
-                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $todayLoans;  }}</h4>
-                <!-- <small class="text-success">(+18%)</small> -->
+                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $todayLoans;  }}</h4> / &nbsp;
+                <small class="text-danger font-weight-bold">{{ isset($loans)?$loans->where('status','Dispatch')->where('created_at', '>=', Carbon::today())->sum('total_loan_amount'):"0" }}</small>
               </div>
               <!-- <p class="mb-0">Up to Date </p> -->
             </div>
@@ -64,8 +67,8 @@
             <div class="content-left">
               <span>Week</span>
               <div class="d-flex align-items-end mt-2">
-                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $weekLoans;  }}</h4>
-                <!-- <small class="text-danger">(-14%)</small> -->
+                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $weekLoans;  }}</h4> / &nbsp;
+                <small class="text-danger font-weight-bold">{{ isset($loans)?$loans->where('status','Dispatch')->where('created_at', '>=', Carbon::now()->startOfWeek())->sum('total_loan_amount'):"0" }}</small>
               </div>
               <!-- <p class="mb-0">Up to Date </p> -->
             </div>
@@ -85,8 +88,8 @@
             <div class="content-left">
               <span>Month</span>
               <div class="d-flex align-items-end mt-2">
-                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $monthLoans;  }}</h4>
-                <!-- <small class="text-success">(+42%)</small> -->
+                <h4 class="mb-0 me-2" style="color:#000;font-weight:bold;">{{ $monthLoans;  }}</h4> / &nbsp;
+                <small class="text-danger font-weight-bold">{{ isset($loans)?$loans->where('status','Dispatch')->where('created_at', '>=', Carbon::now()->startOfMonth())->sum('total_loan_amount'):"0" }}</small>
               </div>
               <!-- <p class="mb-0">Up to Date </p> -->
             </div>
@@ -111,14 +114,15 @@
         <thead>
           <tr>
              <th>Image</th>
-            <th>Loan No</th>
+            <th>Loan#</th>
             <th>Cust.ID</th>
-            <th>Cust.Name</th>
+            <th>Name</th>
             <th>Location</th>
-            <th>Loan Amount</th>
-           <!--  <th>Type</th> -->
-            <th>Int.Scheme</th>
-            <th>Int / Month</th>
+            <th>Amount</th>
+            <th>Quality</th>
+            <th>Scheme</th>
+            <th>Gram</th>
+            <th>Net Gram</th>
             <th>L.Date</th>
             <th>Status</th>
             <th>Actions</th>
@@ -129,23 +133,30 @@
         @foreach ( $loans as $loan)
         <tr>
         <td>
-          @if($loan->customer_photo!=NULL)
-          <a href="{{ asset('storage/' . $loan->customer_other) }}" target="_blank">
-           <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+
+          <a href="{{ asset('storage/' . $loan->customer_photo) }}" target="_blank">
+          <img src="{{ $loan->customer_photo ? asset('storage/' . $loan->customer_photo) : asset('assets/images/sj_logo.png') }}"  alt="Image" style="width:50px; height:50px; border-radius:50%;">
           </a>
-           @else
-           No Image
-           @endif
+
           </td>
           <td>{{ $loan->loan_number }}</td>
           <td>{{ $loan->customer->customer_id }}</td>
           <td>{{ $loan->customer->first_name }} {{ $loan->customer->last_name }}</td>
           <td>{{ $loan->location->branch_name }}</td>
           <td>{{ $loan->total_loan_amount }}</td>
-          <!-- <td>{{ $loan->loanType->loan_types }}</td> -->
+          <td>@php
+          $qualities = explode(',', $loan->jewel_quality); // Convert string to array
+          $count_916 = count(array_filter($qualities, fn($q) => trim($q) === '916'));
+          $count_22ct = count(array_filter($qualities, fn($q) => trim($q) === '22ct'));
+          $count_other = count(array_filter($qualities, fn($q) => trim($q) === 'Others'));
+          @endphp
+          916: {{ $count_916 }}<br> 22ct: {{ $count_22ct }} <br>Others : {{ $count_other }}
+          </td>
 
           <td>{{ $loan->interest_month." - Month" }}</td>
-          <td>{{   number_format((float)$loan->total_interest_amount / $loan->interest_month, 2, '.', '');  }}</td>
+          <td>{{ $loan->jewel_grams }}</td>
+          <td>{{ $loan->jewel_net_grams }}</td>
+
           <td>{{ $loan->created_at }}</td>
           @php
     switch ($loan->status) {
@@ -179,9 +190,9 @@
 
    @if($loan->status!='Rejected' &&  $loan->status!='New')
 
-          <!-- <a href="javascript:void(0);" data-id="{{ $loan->loan_number }}"  title="view"><i class='bx bx-show'></i></i></a>  -->
-          <a href="{{ route('loans.customer_interest_list', $loan->loan_number) }}" title="Interest List"><i class='bx bx-list-ol'></i></a>
-          <!-- <a href="http://127.0.0.1:8000/customers/2/edit" title="Pay Interest"><i class='bx bx-rupee' style="color:red;" ></i></a> -->
+
+          <a href="{{ route('loans.customer_interest_list1', $loan->loan_number) }}" title="Interest List"><i class='bx bx-list-ol'></i></a>
+
 
   <a href="javascript:void(0);"
      class="pay-interest"
@@ -207,8 +218,10 @@
 
   @endif
 
-
-
+  <a  title="Receipt Loan" href="{{ route('new_release-letter', $loan->loan_number) }}" target="_blank"><i class='bx bx-printer'></i></a>
+  @if($is_check)
+  <a  title="Edit Loan" href="{{ route('new_release-letter', $loan->loan_number) }}" target="_blank"><i class='bx bx-pencil'></i></a>
+   @endif
           </td>
 
         </tr>
@@ -334,44 +347,51 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="interestPaymentForm">
-          <div class="form-group">
-            <label for="loanNumber">Loan Number</label>
-            <input type="text" class="form-control" id="loanNumber" name="loan_number" readonly>
-          </div>
+      <form id="interestPaymentForm">
+    <div class="form-group">
+        <label for="loanNumber">Loan Number</label>
+        <input type="text" class="form-control" id="loanNumber" name="loan_number" readonly>
+    </div>
 
-          <div class="form-group">
-            <label>Choose Month to Pay Interest</label>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Month</th>
-                  <th>Interest Due</th>
-                  <th>Pay</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Rows will be dynamically added here by JavaScript -->
-              </tbody>
-            </table>
-          </div>
+    <div class="form-group">
+        <label for="month">Choose Month</label>
+        <select class="form-control" id="payment_month" name="payment_month">
+            <option value="">Select Month</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+    </div>
 
-          <input type="hidden" class="form-control" id="paymentAmount" name="payment_amount" required>
+    <div class="form-group">
+        <label for="paymentAmount">Interest Amount</label>
+        <input type="number" class="form-control" id="paymentAmount" name="interest_amount" placeholder="Interest">
+    </div>
 
-          <div class="form-group">
-            <label for="paymentType">Payment Method</label>
-            <select class="form-control" id="paymentType" name="payment_method" required>
-              <option value="cash">Cash</option>
-              <option value="gpay">GPay</option>
-              <option value="bank_transfer">Bank Transfer</option>
-            </select>
-          </div>
+    <div class="form-group">
+        <label for="paymentType">Payment Method</label>
+        <select class="form-control" id="paymentType" name="payment_method" required>
+            <option value="cash">Cash</option>
+            <option value="gpay">GPay</option>
+            <option value="bank_transfer">Bank Transfer</option>
+        </select>
+    </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save Payment</button>
-          </div>
-        </form>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save Payment</button>
+    </div>
+</form>
+
       </div>
     </div>
   </div>
@@ -504,50 +524,7 @@
 
 <script>
 $(document).ready(function() {
-    $('.pay-interest').on('click', function() {
-        var loanNumber = $(this).data('id'); // Get loan number from data-id
-        var loanStartDate = $(this).data('start-date'); // Get loan start date from data-start-date
-        var interestAmount = $(this).data('interest-amount'); // Get interest amount
 
-        // Populate loan number in the modal
-        $('#loanNumber').val(loanNumber);
-
-        // Call function to dynamically generate the months based on loan start date
-        generateMonths(loanStartDate, interestAmount);
-
-        // Open the modal
-        $('#interestPaymentModal').modal('show');
-    });
-
-    // Function to generate months based on loan start date
-    function generateMonths(startDate, interestAmount) {
-        var start = new Date(startDate); // Convert to Date object
-        var today = new Date(); // Get current date
-
-        var tbody = $('#interestPaymentForm tbody');
-        tbody.empty(); // Clear previous entries
-
-        var interestAmount = interestAmount; // You can make this dynamic
-        var monthNames = ["January", "February", "March", "April", "May", "June",
-                          "July", "August", "September", "October", "November", "December"];
-
-        while (start <= today) {
-            var monthName = monthNames[start.getMonth()]; // Get month name
-            var monthNumber = start.getMonth() + 1; // Get month number (1-12)
-
-            // Append each month as a new row
-            tbody.append(`
-              <tr>
-                <td>${monthName} ${start.getFullYear()}</td>
-                <td>${interestAmount}</td>
-                <td><input type="radio" name="payment_month" value="${monthNumber}" data-interest="${interestAmount}"required></td>
-              </tr>
-            `);
-
-            // Move to the next month
-            start.setMonth(start.getMonth() + 1);
-        }
-    }
 
 
 
@@ -555,9 +532,9 @@ $(document).ready(function() {
     // Payment Amount
 
    // Capture the interest amount when a month is selected
-   $(document).ready(function() {
+  /*  $(document).ready(function() {
     // Event handler for when a month is selected
-    $(document).on('change', 'input[name="payment_month"]', function() {
+    $(document).on('change', 'input[name="  "]', function() {
         var interestAmount = $(this).data('interest');  // Get interest amount from the selected radio button
 
         // Check if interestAmount exists
@@ -567,7 +544,7 @@ $(document).ready(function() {
         } else {
             alert("Interest amount not available for this month.");
         }
-    });
+    }); */
 
     // On form submit, check if paymentAmount is set
     $('#interestPaymentForm').on('submit', function(e) {
@@ -583,7 +560,7 @@ $(document).ready(function() {
         // Collect form data (assuming other fields are validated)
         var formData = {
         loan_number: $('#loanNumber').val(),
-        payment_month: $('input[name="payment_month"]:checked').val(),
+        payment_month: $('#payment_month').val(),
         payment_amount: $('#paymentAmount').val(),
         payment_method: $('#paymentType').val(),
         _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
@@ -591,7 +568,7 @@ $(document).ready(function() {
 
         // AJAX request to submit the form
           $.ajax({
-          url: '{{ route("interest.payment.store", "") }}',
+          url: '{{ route("interest.payment.paid", "") }}',
           method: 'POST',
           data: formData,
           success: function(response) {
@@ -608,10 +585,88 @@ $(document).ready(function() {
     });
 });
 
+
+
+</script>
+<script>
+  $(document).ready(function () {
+    // Event handler for the "pay-interest" button click
+    $('.pay-interest').on('click', function () {
+        var loanNumber = $(this).data('id'); // Get loan number from data-id
+        var loanStartDate = $(this).data('start-date'); // Get loan start date from data-start-date
+        var interestAmount = $(this).data('interest-amount'); // Get interest amount
+
+        // Populate loan number in the modal
+        $('#loanNumber').val(loanNumber);
+
+        // Call function to dynamically generate the months based on loan start date
+      //  generateMonths(loanStartDate, interestAmount);
+
+        // Open the modal
+        $('#interestPaymentModal').modal('show');
+    });
+
+    // Function to generate months based on loan start date
+    function generateMonths(startDate, interestAmount) {
+        var start = new Date(startDate); // Convert to Date object
+        var today = new Date(); // Get current date
+
+        var tbody = $('#interestPaymentForm tbody');
+        tbody.empty(); // Clear previous entries
+
+        var monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        while (start <= today) {
+            var monthName = monthNames[start.getMonth()]; // Get month name
+            var monthNumber = `${start.getFullYear()}-${start.getMonth() + 1}`; // Year-Month format
+
+            // Append each month as a new row
+            tbody.append(`
+              <tr>
+                <td>${monthName} ${start.getFullYear()}</td>
+                <td>
+                  <input
+                    type="text"
+                    value="${interestAmount}"
+                    class="form-control interest-amount"
+                    data-month="${monthNumber}">
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    name="payment_month"
+                    value="${monthNumber}"
+                    data-interest="${interestAmount}"
+                    required>
+                </td>
+              </tr>
+            `);
+
+            // Move to the next month
+            start.setMonth(start.getMonth() + 1);
+        }
+    }
+
+    // Update interest amount in the selected payment month
+    $(document).on('input', '.interest-amount', function () {
+        let updatedAmount = $(this).val();
+        let monthNumber = $(this).data('month');
+
+        // Update the radio button's data-interest attribute
+        $(`input[name="payment_month"][value="${monthNumber}"]`).data('interest', updatedAmount);
+    });
+
+    // Update payment amount when a radio button is selected
+    $(document).on('change', 'input[name="payment_month"]', function () {
+        let selectedInterest = $(this).data('interest');
+        $('#paymentAmount').val(selectedInterest); // Update the payment amount input field
+    });
 });
 
 </script>
-
 
 <script>
     document.getElementById('actionModal').addEventListener('show.bs.modal', function (event) {

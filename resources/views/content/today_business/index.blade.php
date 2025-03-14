@@ -1,6 +1,6 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Customer Management')
+@section('title', 'Report Management')
 
 @section('page-script')
 <script src="{{asset('assets/js/form-basic-inputs.js')}}"></script>
@@ -42,82 +42,137 @@
 
     <div align="center"><h4  style="color:red;">SELVA JEYAM GOLD FINANACE (P) LTD</h4></div>
     <div align="center"><h5  style="color:red;">TODAY BUSINESS REPORT - @php echo date('d-m-Y') @endphp</h5></div>
-      <table class="table" >
-      <thead>
-        <tr>
+    <table class="table">
+    <thead>
+        <tr style="background-color:lightgray;">
             <th>Particular</th>
-            <th>Amount</th>
+            <th>Credit (₹)</th>
+            <th>Debit (₹)</th>
             <th>Grams</th>
+            <th>POC</th>
         </tr>
     </thead>
     <tbody>
         <!-- New Loans -->
         <tr>
-            <td>New Loans</td>
+            <td>SJ Loans</td>
             <td>{{ number_format($dailyReport['new_loans']['amount'], 2) }}</td>
+            <td>--</td>
             <td>{{ number_format($dailyReport['new_loans']['grams'], 2) }}</td>
+            <td>{{ $dailyReport['new_loans']['total']  }}</td>
         </tr>
-        <!-- Released Loans -->
-        <tr>
-            <td>Released Loans</td>
-           <!--  <td>{{ number_format($dailyReport['released_loans']['amount'], 2) }}</td>
-            <td>{{ number_format($dailyReport['released_loans']['grams'], 2) }}</td> -->
-            <td>{{ number_format($dailyReport['loan_release']['amount'], 2) }}</td>
-            <td>{{ number_format($dailyReport['loan_release']['total_grams'], 2) }}</td>
-        </tr>
-        <!-- Total Loans Upto Today -->
 
+
+
+        <!-- SJ Document Charge -->
         <tr>
             <td>SJ Document Charge</td>
+            <td>--</td>
             <td>{{ number_format($dailyReport['total_loans_upto_today']['total_document_charges'], 2) }}</td>
-            <td>--</td> <!-- No grams for this category -->
-        </tr>
-        <!-- Today's Expenses -->
-        <tr>
-            <td>Today's Expenses</td>
-            <td>{{ number_format($dailyReport['today_expenses'], 2) }}</td>
-            <td>—</td> <!-- No grams for this category -->
-        </tr>
-        <!-- Interest Received -->
-        <tr>
-            <td>Interest Received</td>
-            <td>{{ number_format($dailyReport['interest_received'], 2) }}</td>
-            <td>—</td> <!-- No grams for this category -->
-        </tr>
-        <tr>
-            <td>SH Document Charge</td>
-            <td>{{ number_format($dailyReport['other_bank_loans']['other_bank_document_charges'], 2) }}</td>
-            <td>--</td> <!-- No grams for this category -->
-        </tr>
-        <tr>
-            <td style="color:green !important;font-weight:bold;">OB Loans</td>
-            <td style="color:green !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['amount'], 2) }}</td>
-            <td style="color:green !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['grams'], 2) }}</td>
+
+            <td>--</td>
+            <td>--</td>
         </tr>
 
-    </tbody>
-    <tfoot>
-        <!-- Totals -->
+
+
+
+        <!-- Released Loans -->
+          <tr>
+            <td>SJ Released Loans</td>
+            <td>{{ number_format($dailyReport['loan_release']['amount'], 2) }}</td>
+            <td>--</td>
+            <td>{{ number_format($dailyReport['loan_release']['total_grams'], 2) }}</td>
+            <td>--</td>
+        </tr>
+
+        <!-- Interest Received (Moved to Debit Column) -->
         <tr>
+            <td>SJ Interest Received</td>
+            <td>--</td>
+            <td>{{ number_format($dailyReport['interest_received'], 2) }}</td>
+            <td>--</td>
+        </tr>
+
+
+         <!-- OB Loans -->
+         <tr>
+            <td style="color:purple !important;font-weight:bold;">SH Loans</td>
+            <td style="color:purple !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['amount'], 2) }}</td>
+            <td>--</td>
+            <td style="color:purple !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['grams'], 2) }}</td>
+            <td>--</td>
+          </tr>
+        <!-- SH Document Charge -->
+        <tr>
+            <td style="color:purple !important;font-weight:bold;">SH Document Charge</td>
+            <td style="color:purple !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['other_bank_document_charges'], 2) }}</td>
+            <td>--</td>
+            <td>--</td>
+        </tr>
+
+
+         <!-- SH Interest Paid -->
+         <tr>
+            <td style="color:purple !important;font-weight:bold;">SH Interest Paid</td>
+            <td style="color:purple !important;font-weight:bold;">{{ number_format($dailyReport['Shinterestpaid'], 2) }}</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+        </tr>
+ <!-- SH Released Loan -->
+        <tr>
+            <td style="color:purple !important;font-weight:bold;">SH Released</td>
+            <td>--</td>
+            <td style="color:purple !important;font-weight:bold;">{{ number_format($dailyReport['other_bank_loans']['loan_release_amount'], 2) }}</td>
+
+            <td>--</td>
+            <td>--</td>
+        </tr>
+
+        <!-- Today's Expenses -->
+        <tr>
+            <td style="color:orange !important;font-weight:bold;">Today's Expenses</td>
+
+            <td style="color:orange !important;font-weight:bold;">{{ number_format($dailyReport['today_expenses'], 2) }}</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+        </tr>
+
+
+    </tbody>
+
+    <tfoot >
+        <!-- Totals -->
+        <tr >
             <th>Total</th>
             <th style="color:red; font-weight:bold;">
                 {{ number_format(
                     $dailyReport['new_loans']['amount'] +
-                    $dailyReport['released_loans']['amount'] +
-                    $dailyReport['total_loans_upto_today']['amount'] +
+                    $dailyReport['loan_release']['amount'] +
                     $dailyReport['today_expenses'] +
-                    $dailyReport['interest_received'], 2) }}
+
+                    $dailyReport['other_bank_loans']['other_bank_document_charges'] +
+                    $dailyReport['other_bank_loans']['amount'], 2) }}
             </th>
-            <th style="color:red; font-weight:bold;">
+            <th style="color:green; font-weight:bold;">
+                {{ number_format($dailyReport['total_loans_upto_today']['total_document_charges'] +
+                  $dailyReport['other_bank_loans']['loan_release_amount'] +
+
+                  + $dailyReport['interest_received'], 2) }}
+            </th>
+            <th style="color:purple; font-weight:bold;">
                 {{ number_format(
                     $dailyReport['new_loans']['grams'] +
-                    $dailyReport['released_loans']['grams'] + $dailyReport['total_loans_upto_today']['upto_total_grams'] + $dailyReport['other_bank_loans']['grams'], 2)  }}
+                    $dailyReport['loan_release']['total_grams'] +
+                    $dailyReport['other_bank_loans']['grams'], 2) }}
             </th>
+            <th style="color:red; font-weight:bold;">{{ $dailyReport['new_loans']['total']  }}</th>
         </tr>
     </tfoot>
+</table>
 
-
-    </table>
   </div>
 </div>
 

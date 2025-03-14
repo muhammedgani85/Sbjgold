@@ -22,10 +22,28 @@ class ExpenseController extends Controller
     $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : null;
     $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date')) : null;
 
+    $role = session('user_data')->role;
+    $location = session('user_data')->location;
+    $is_check = AttendanceController::check_role($role);
+    if($is_check){
+
+
     $query = DB::table('expenses')
         ->join('office_expense_types', 'expenses.expense_type_id', '=', 'office_expense_types.id')
         ->select('expenses.*', 'office_expense_types.name as type_name')
         ->whereNull('expenses.deleted_at');
+    }else{
+      $query = DB::table('expenses')
+        ->join('office_expense_types', 'expenses.expense_type_id', '=', 'office_expense_types.id')
+        ->select('expenses.*', 'office_expense_types.name as type_name')
+        ->where('location',$location)
+        ->whereNull('expenses.deleted_at');
+
+
+    }
+
+
+
 
     // Filter by date range if provided
     if ($startDate && $endDate) {
@@ -38,10 +56,10 @@ class ExpenseController extends Controller
     $expenses = $query->get();
 
     // Calculate summaries
-    $todayExpenses = DB::table('expenses')->whereDate('date', Carbon::today())->whereNull('expenses.deleted_at')->sum('amount');
-    $yesterdayExpenses = DB::table('expenses')->whereDate('date', Carbon::yesterday())->whereNull('expenses.deleted_at')->sum('amount');
-    $weekExpenses = DB::table('expenses')->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->whereNull('expenses.deleted_at')->sum('amount');
-    $monthExpenses = DB::table('expenses')->whereMonth('date', Carbon::now()->month)->whereNull('expenses.deleted_at')->sum('amount');
+    $todayExpenses = DB::table('expenses')->whereDate('date', Carbon::today())->whereNull('expenses.deleted_at')->where('location',$location)->sum('amount');
+    $yesterdayExpenses = DB::table('expenses')->whereDate('date', Carbon::yesterday())->whereNull('expenses.deleted_at')->where('location',$location)->sum('amount');
+    $weekExpenses = DB::table('expenses')->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->whereNull('expenses.deleted_at')->where('location',$location)->sum('amount');
+    $monthExpenses = DB::table('expenses')->whereMonth('date', Carbon::now()->month)->whereNull('expenses.deleted_at')->where('location',$location)->sum('amount');
 
     return view('content.expenses.index', compact('expenses', 'todayExpenses', 'yesterdayExpenses', 'weekExpenses', 'monthExpenses'));
 
@@ -55,8 +73,19 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        $today = Carbon::today();
-        $expenses = Expense::with('expenseType')->whereDate('date', $today)->get();
+        $today = date('Y-m-d');
+
+
+        $role = session('user_data')->role;
+        $location = session('user_data')->location;
+        $is_check = AttendanceController::check_role($role);
+        if($is_check){
+          $expenses = Expense::with('expenseType')->where('date', $today)->where('location',$location)->get();
+        }else{
+           $expenses = Expense::with('expenseType')->where('date', $today)->where('location',$location)->get();
+
+        }
+
         $totalAmount = $expenses->sum('amount');
         $expenseTypes  = OfficeExpenseType::all();
         $cus_id = '';
@@ -160,4 +189,64 @@ class ExpenseController extends Controller
         }
         Log::debug($e->getMessage());
     }
+
+
+    public function list_expenses(){
+
+      $expenses = OfficeExpenseType::where('status','Active')->get();
+
+      return view('content.expenses.list_expenses',compact('expenses'));
+
+    }
+
+
+    public function new_expences(){
+
+
+
+      return view('content.expenses.add_type');
+
+    }
+
+
+    public function new_expences_save(Request $request){
+      try {
+
+        $request->validate([
+          'name' => 'required|string|max:255',
+          'status' => 'required|string',
+
+        ]);
+
+        OfficeExpenseType::create($request->all());
+
+
+       return redirect()->route('expenses.create')->with('success', 'Expenses added successfully');
+
+    } catch (Exception $e) {
+        Log::debug($e->getMessage());
+    }
+    }
+
+
+
+    public function new_ex_update(Request $request, $id)
+{
+  $request->validate([
+    'name' => 'required|string|max:255',
+    'status' => 'required|string',
+
+  ]);
+
+
+    $expense = OfficeExpenseType::findOrFail($id);
+    $expense->update($request->all());
+
+    return redirect()->route('new_expences.index')->with('success', 'Expense updated successfully!');
+}
+
+
+
+
+
 }

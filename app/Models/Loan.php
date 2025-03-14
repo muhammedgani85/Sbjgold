@@ -12,7 +12,7 @@ class Loan extends Model
 
 
     protected $fillable = [
-      'loan_number', 'customer_id', 'location_id', 'loan_type_id', 'loan_amount', 'jewel_grams', 'jewel_net_grams', 'additional_cost', 'total_loan_amount', 'total_interest_amount', 'per_month_payable_amount', 'total_include_int_amount', 'interest_type_id', 'document_charge', 'customer_photo', 'customer_other', 'interest_per', 'interest_month', 'pergram_amount'
+      'loan_number', 'customer_id', 'location_id', 'loan_type_id', 'loan_amount', 'jewel_grams', 'jewel_net_grams', 'additional_cost', 'total_loan_amount', 'total_interest_amount', 'per_month_payable_amount', 'total_include_int_amount', 'interest_type_id', 'document_charge', 'customer_photo', 'customer_other', 'interest_per', 'interest_month', 'pergram_amount','remarks','jewel_quality'
   ];
 
   public function customer()

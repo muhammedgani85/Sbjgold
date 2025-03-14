@@ -38,7 +38,7 @@
 
     <div class="table-responsive text-nowrap">
 
-      <table class="table" style="margin-bottom: 20px;" id="usersTable">
+      <table class="table" id="usersTable">
       <thead>
                 <tr>
                   <th>Image</th>
@@ -57,13 +57,9 @@
                 <tr>
 
                     <td>
-                    @if($loan->customer_photo!=NULL)
                     <a href="{{ asset('storage/' . $loan->customer_photo) }}" target="_blank">
-                    <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+                    <img src="{{ $loan->customer_photo ? asset('storage/' . $loan->customer_photo) : asset('assets/images/sj_logo.png') }}"  alt="Image" style="width:50px; height:50px; border-radius:50%;">
                     </a>
-                    @else
-                    No Image
-                    @endif
                     </td>
                     <td>{{ $loan->loan_number }}</td>
                     <td>{{ $loan->customer->first_name.' '.$loan->customer->last_name }}</td>

@@ -158,9 +158,9 @@
         <div class="card-body demo-vertical-spacing demo-only-element">
 
         <div class="input-group">
-        @if($loan->customer_other!=NULL)
+        @if($loan->customer_photo!=NULL)
 
-                    <img src="{{ asset('storage/' . $loan->customer_other) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
+        <img src="{{ asset('storage/' . $loan->customer_photo) }}" alt="Image" style="width:100px; height:100px;border:1px solid lightgrey;border-radius: 25px;">
 
                     @else
                     No Image

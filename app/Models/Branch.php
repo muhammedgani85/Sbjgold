@@ -23,6 +23,10 @@ public function funds()
     {
         return $this->hasMany(Fund::class, 'location');
     }
+    public function banks()
+    {
+        return $this->hasMany(Banks::class, 'location', 'id');
+    }
 
 
 }

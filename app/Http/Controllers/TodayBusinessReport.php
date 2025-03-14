@@ -7,8 +7,12 @@ use App\Models\Expense;
 use App\Models\Loan;
 use App\Models\LoanInterestPayment;
 use App\Models\LoanRelease;
+use App\Models\OtherBankInterestPayment;
 use App\Models\OtherBankLoan;
+use App\Models\SHLoanRelease;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Exception;
 
 class TodayBusinessReport extends Controller
 {
@@ -18,6 +22,8 @@ class TodayBusinessReport extends Controller
 
      public function index(Request $request)
     {
+
+      try{
       $location = session('user_data')->location;
 
       $date = $request->input('date', today()->toDateString());
@@ -64,7 +70,16 @@ class TodayBusinessReport extends Controller
       // Query for interest received
       $interestReceived = LoanInterestPayment::whereDate('created_at', $date)
           ->when($locationId, function ($query) use ($locationId) {
-             // return $query->where('location', $locationId);
+              return $query->where('location', $locationId);
+          })
+          ->sum('interest_amount');
+
+
+     // Query for Other bank interest paid
+
+     $Shinterestpaid = OtherBankInterestPayment::whereDate('created_at', $date)
+          ->when($locationId, function ($query) use ($locationId) {
+              return $query->where('location', $locationId);
           })
           ->sum('interest_amount');
 
@@ -73,12 +88,13 @@ class TodayBusinessReport extends Controller
           ->when($locationId, function ($query) use ($locationId) {
               return $query->where('loans.location_id', $locationId);
           })
+          ->whereDate('other_bank_loans.loan_date', $date) // Filter by today's date
           ->selectRaw(
               'SUM(loans.jewel_net_grams) as total_grams,
                SUM(other_bank_loans.loan_amount) as total_amount,
                SUM(other_bank_loans.document_charges) as other_bank_document_charges,
                COUNT(other_bank_loans.id) as total_loans'
-          )
+          )->where('other_bank_loans.status','Active')
           ->first();
 
 
@@ -89,11 +105,26 @@ class TodayBusinessReport extends Controller
           ->when($locationId, function ($query) use ($locationId) {
               return $query->where('loans.location_id', $locationId);
           })
+          ->whereDate('loan_releases.release_date', $date) // Filter by today's date
           ->selectRaw(
               'SUM(loans.jewel_net_grams) as total_grams,
                SUM(loan_releases.amount) as total_amount,
                SUM(loan_releases.interest) as total_interest,
                COUNT(loan_releases.id) as total_loans'
+          )
+          ->first();
+
+
+          $other_loanRelease = SHLoanRelease::join('loans', 'loans.loan_number', '=', 'sh_loan_releases.loan_number')
+          ->when($locationId, function ($query) use ($locationId) {
+              return $query->where('loans.location_id', $locationId);
+          })
+          ->whereDate('sh_loan_releases.release_date', Carbon::today()) // Filter by today's date
+          ->selectRaw(
+              'SUM(loans.jewel_net_grams) as total_grams,
+               SUM(sh_loan_releases.amount) as total_amount,
+               SUM(sh_loan_releases.interest) as total_interest,
+               COUNT(sh_loan_releases.id) as total_loans'
           )
           ->first();
 
@@ -120,6 +151,7 @@ class TodayBusinessReport extends Controller
               'grams' => $otherBankLoans->total_grams ?? 0,
               'amount' => $otherBankLoans->total_amount ?? 0,
               'other_bank_document_charges' => $otherBankLoans->other_bank_document_charges ?? 0,
+              'loan_release_amount' =>$other_loanRelease->total_amount + $other_loanRelease->total_interest ?? 0,
           ],
           'loan_release' => [
             'amount' => $loanRelease->total_amount + $loanRelease->total_interest ?? 0,
@@ -128,6 +160,7 @@ class TodayBusinessReport extends Controller
            ],
           'today_expenses' => $todayExpenses,
           'interest_received' => $interestReceived,
+          'Shinterestpaid' => $Shinterestpaid
       ];
 
 
@@ -136,6 +169,12 @@ class TodayBusinessReport extends Controller
 
 
       return view('content.today_business.index',compact('dailyReport','locations'));
+
+    } catch(Exception $e){
+      return response()->json(['error' => $e->getMessage()], 500);
+    }
+
+
     }
 
     /**
